@@ -17,6 +17,26 @@ void invalid(const std::string& source) {
 }
 int main() {
     try {
+        bool missingRejected = false;
+        try { zuma::loadLevel("__zuma_missing_directory__/level.txt"); }
+        catch (const std::runtime_error& error) {
+            missingRejected = std::string(error.what()).find("无法打开关卡文件") != std::string::npos;
+        }
+        require(missingRejected, "missing file must report open failure");
+        const auto rejectConfig = [](zuma::Level config, zuma::SpecialOptions options = {}) {
+            bool rejected = false;
+            try { zuma::Game game(config, options); } catch (const std::invalid_argument&) { rejected = true; }
+            require(rejected, "core accepted invalid configuration");
+        };
+        rejectConfig(level("X", "", "R"));
+        rejectConfig(level("R", "X", "R"));
+        rejectConfig(level("R", "", "X"));
+        rejectConfig(level("R", "", ""));
+        rejectConfig(level("R", "", "R", 0));
+        rejectConfig(level("RR", "", "R", 1));
+        rejectConfig(level("R", "", "R"), {101, 0, {}});
+        rejectConfig(level("R", "", "R"), {0, 0, {zuma::Special::None, zuma::Special::Back}});
+        rejectConfig(level("R", "", "R"), {0, 0, {static_cast<zuma::Special>(99)}});
         using zuma::Special;
         zuma::SpecialOptions stopOptions{0, 0, {Special::Stop, Special::None}};
         zuma::Game stopped(level("RR", "GBYP", "R"), stopOptions);

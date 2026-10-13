@@ -1,2 +1,4 @@
 /build/
+/.playwright-mcp/
+__pycache__/
 *.exe

@@ -55,7 +55,7 @@ Level readLevel(std::istream& input) {
 }
 Level loadLevel(const std::string& path) {
     std::ifstream file(path);
-    if (!file) throw std::runtime_error("无法打开关卡文件: " + path);
+    if (!file.is_open()) throw std::runtime_error("无法打开关卡文件: " + path);
     return readLevel(file);
 }
 }

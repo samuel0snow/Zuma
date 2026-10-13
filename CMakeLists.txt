@@ -3,6 +3,23 @@ project(Zuma LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+if(MINGW)
+  # Some mixed MinGW installations default headers to UCRT but ship an
+  # MSVCRT libstdc++. Detect that ABI mismatch before using stream buffers.
+  include(CheckCXXSourceCompiles)
+  set(ZUMA_STREAMBUF_CHECK "#include <streambuf>\nstruct Buffer:std::streambuf { std::streamsize xsputn(const char*, std::streamsize n) override {return n;} };\nint main(){Buffer b; return b.sputn(\"x\",1)!=1;}")
+  check_cxx_source_compiles("${ZUMA_STREAMBUF_CHECK}" ZUMA_CRT_COMPATIBLE)
+  if(NOT ZUMA_CRT_COMPATIBLE)
+    set(CMAKE_REQUIRED_DEFINITIONS -D__MSVCRT_VERSION__=0x600)
+    check_cxx_source_compiles("${ZUMA_STREAMBUF_CHECK}" ZUMA_MSVCRT_COMPATIBLE)
+    unset(CMAKE_REQUIRED_DEFINITIONS)
+    if(NOT ZUMA_MSVCRT_COMPATIBLE)
+      message(FATAL_ERROR "MinGW headers and libstdc++ are incompatible. Install a consistent toolchain.")
+    endif()
+    message(STATUS "Using MSVCRT header ABI for this mixed MinGW installation")
+    add_compile_definitions(__MSVCRT_VERSION__=0x600)
+  endif()
+endif()
 add_library(zuma_core src/game.cpp src/level.cpp)
 target_include_directories(zuma_core PUBLIC include)
 if(MSVC)
@@ -15,7 +32,12 @@ target_link_libraries(zuma PRIVATE zuma_core)
 if(MINGW)
   target_link_options(zuma PRIVATE -static -static-libgcc -static-libstdc++)
 endif()
-file(COPY Zuma/level1.txt Zuma/level2.txt DESTINATION ${CMAKE_BINARY_DIR}/levels)
+add_custom_command(TARGET zuma POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:zuma>/levels"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_SOURCE_DIR}/Zuma/level1.txt" "${CMAKE_SOURCE_DIR}/Zuma/level2.txt"
+    "$<TARGET_FILE_DIR:zuma>/levels"
+  VERBATIM)
 enable_testing()
 add_executable(zuma_tests tests/tests.cpp)
 target_link_libraries(zuma_tests PRIVATE zuma_core)
@@ -23,3 +45,37 @@ if(MINGW)
   target_link_options(zuma_tests PRIVATE -static -static-libgcc -static-libstdc++)
 endif()
 add_test(NAME zuma_rules COMMAND zuma_tests)
+
+find_package(Threads REQUIRED)
+add_library(zuma_api src/server/api.cpp)
+target_include_directories(zuma_api SYSTEM PUBLIC third_party/json)
+target_link_libraries(zuma_api PUBLIC zuma_core Threads::Threads)
+add_executable(zuma_gui src/server/main.cpp)
+target_include_directories(zuma_gui SYSTEM PRIVATE third_party/httplib)
+target_link_libraries(zuma_gui PRIVATE zuma_api Threads::Threads)
+if(WIN32)
+  target_link_libraries(zuma_gui PRIVATE ws2_32)
+endif()
+if(MINGW)
+  target_link_options(zuma_gui PRIVATE -static -static-libgcc -static-libstdc++)
+endif()
+set(ZUMA_GUI_ASSET_COMMANDS
+  COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:zuma_gui>/levels"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_SOURCE_DIR}/Zuma/level1.txt" "${CMAKE_SOURCE_DIR}/Zuma/level2.txt"
+    "$<TARGET_FILE_DIR:zuma_gui>/levels"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/web" "$<TARGET_FILE_DIR:zuma_gui>/web"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/third_party" "$<TARGET_FILE_DIR:zuma_gui>/third_party")
+add_custom_command(TARGET zuma_gui POST_BUILD ${ZUMA_GUI_ASSET_COMMANDS} VERBATIM)
+add_custom_target(zuma_gui_assets ALL ${ZUMA_GUI_ASSET_COMMANDS} VERBATIM)
+add_executable(zuma_api_tests tests/api_tests.cpp)
+target_link_libraries(zuma_api_tests PRIVATE zuma_api)
+if(MINGW)
+  target_link_options(zuma_api_tests PRIVATE -static -static-libgcc -static-libstdc++)
+endif()
+add_test(NAME zuma_api_rules COMMAND zuma_api_tests)
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_Interpreter_FOUND)
+  add_test(NAME zuma_http_contract COMMAND ${Python3_EXECUTABLE}
+    "${CMAKE_SOURCE_DIR}/tests/http_tests.py" "$<TARGET_FILE:zuma_gui>")
+endif()
