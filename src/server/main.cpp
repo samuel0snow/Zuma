@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
     server.set_pre_routing_handler([&](const httplib::Request& request, httplib::Response& response) {
         const auto requestedHost = request.get_header_value("Host");
         bool rejected = requestedHost != host && requestedHost != alternateHost;
+        if (port == 80 && (requestedHost == "127.0.0.1" || requestedHost == "localhost")) rejected = false;
         if (request.has_header("Origin")) rejected = rejected || request.get_header_value("Origin") != "http://" + requestedHost;
         if (request.get_header_value("Sec-Fetch-Site") == "cross-site") rejected = true;
         if (request.method == "POST" && (request.get_header_value("X-Zuma-Client") != "1" ||
@@ -75,17 +76,38 @@ int main(int argc, char** argv) {
     server.Get("/api/levels", route); server.Get("/api/game", route);
     server.Post("/api/game", route); server.Post("/api/action", route); server.Post("/api/reset", route);
     // Serve only known assets; arbitrary paths never become filesystem paths.
-    for (const auto& asset : {"index.html", "style.css", "app.js"}) {
+    for (const auto& asset : {"index.html", "style.css", "app.js", "animation.js"}) {
         const std::string filename = asset;
         auto serve = [web, filename](const httplib::Request&, httplib::Response& response) {
             std::ifstream file(web + "/" + filename, std::ios::binary);
             if (!file.is_open()) { response.status = 404; return; }
             std::ostringstream bytes; bytes << file.rdbuf();
-            const auto mime = filename == "style.css" ? "text/css" : filename == "app.js" ? "application/javascript" : "text/html";
+            const auto mime = filename == "style.css" ? "text/css" : filename == "app.js" || filename == "animation.js" ? "application/javascript" : "text/html";
             response.set_content(bytes.str(), std::string(mime) + "; charset=utf-8");
         };
-        server.Get("/" + filename, serve);
+        auto routePath = "/" + filename;
+        for (std::size_t i = 0; (i = routePath.find('.', i)) != std::string::npos; i += 2) routePath.insert(i, "\\");
+        server.Get(routePath, serve);
         if (filename == "index.html") server.Get("/", serve);
+    }
+    // Assets are explicit routes, never an arbitrary directory mount.
+    const std::vector<std::string> assets = {
+        "backgrounds/courtyard.webp", "launcher/pedestal.svg", "track/paving-512x128.jpg",
+        "balls/vector/red.svg", "balls/vector/green.svg", "balls/vector/blue.svg", "balls/vector/yellow.svg", "balls/vector/purple.svg",
+        "icons/ui/back.svg", "icons/ui/stop.svg", "icons/ui/boom.svg", "icons/ui/victory.svg", "icons/ui/defeat.svg",
+        "effects/flash-seq/sheet.png", "effects/boom-seq/sheet.png", "effects/ring-seq/sheet.png", "CREDITS.md"
+    };
+    for (const auto& filename : assets) {
+        auto routePath = "/assets/" + filename;
+        for (std::size_t i = 0; (i = routePath.find('.', i)) != std::string::npos; i += 2) routePath.insert(i, "\\");
+        server.Get(routePath, [web, filename](const httplib::Request&, httplib::Response& response) {
+            std::ifstream file(web + "/assets/" + filename, std::ios::binary);
+            if (!file.is_open()) { response.status = 404; return; }
+            std::ostringstream bytes; bytes << file.rdbuf();
+            const auto extension = filename.substr(filename.find_last_of('.') + 1);
+            const auto mime = extension == "svg" ? "image/svg+xml" : extension == "png" ? "image/png" : extension == "jpg" ? "image/jpeg" : extension == "webp" ? "image/webp" : "text/plain; charset=utf-8";
+            response.set_content(bytes.str(), mime);
+        });
     }
     server.Get("/favicon.ico", [](const httplib::Request&, httplib::Response& response) { response.status = 204; });
     std::cout << "Zuma GUI: http://127.0.0.1:" << port << "\n按 Ctrl+C 停止服务。\n" << std::flush;

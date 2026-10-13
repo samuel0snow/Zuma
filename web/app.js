@@ -37,11 +37,17 @@ function lock() {
     button.disabled = busy || !connected || !level?.available;
   }
   $('reconnect').disabled = busy;
+  $('skip-animation').disabled = false;
 }
 function ball(color, sizeClass = '') {
   const element = document.createElement('span');
   element.className = `ball color-${color} ${sizeClass}`;
-  element.textContent = color;
+  const colors = {R:'red',G:'green',B:'blue',Y:'yellow',P:'purple'};
+  const image = document.createElement('img'); image.src = `/assets/balls/vector/${colors[color]}.svg`;
+  image.alt='';image.className='ball-art';image.draggable=false;
+  image.addEventListener('error',()=>image.remove(),{once:true});
+  const letter=document.createElement('span');letter.className='ball-letter';letter.textContent=color;
+  element.append(image,letter);
   element.setAttribute('aria-label', `${{R:'红',G:'绿',B:'蓝',Y:'黄',P:'紫'}[color]}球 ${color}`);
   return element;
 }
@@ -49,7 +55,11 @@ function ballColumn(item) {
   const column = document.createElement('div');
   column.className = 'track-ball'; column.dataset.ballId = item.id;
   column.append(ball(item.color));
-  if (item.special) { const label = document.createElement('span'); label.className = 'special-tag'; label.textContent = item.special; column.append(label); }
+  if (item.special) {
+    const label = document.createElement('span'); label.className = 'special-tag';
+    const image = document.createElement('img');image.src=`/assets/icons/ui/${item.special.toLowerCase()}.svg`;image.alt='';image.addEventListener('error',()=>image.remove(),{once:true});
+    label.append(image,document.createTextNode(item.special));column.append(label);
+  }
   return column;
 }
 function renderLevels() {
@@ -69,41 +79,42 @@ function renderLevels() {
   }
   lock();
 }
-function renderGame() {
-  $('game-heading').textContent = `关卡 ${state.levelId} · ${titles[state.levelId]}`;
-  $('game-mode').textContent = state.specialsEnabled ? '特殊属性模式 / 10% 属性概率' : '经典模式';
-  $('score').textContent = state.score; $('turns').textContent = state.turns;
-  $('length').textContent = `${state.track.length} / ${state.maxLength}`;
-  const finished = state.status !== 'playing';
-  $('track-status').textContent = state.status === 'won' ? '全部清空' : state.status === 'lost' ? '超出容量' : state.stoppedTurns ? '停滞中' : state.track.length === state.maxLength ? '轨道已满' : '等待发射';
+function renderGame(game = state) {
+  $('game-heading').textContent = `关卡 ${game.levelId} · ${titles[game.levelId]}`;
+  $('game-mode').textContent = game.specialsEnabled ? '特殊属性模式 / 10% 属性概率' : '经典模式';
+  $('score').textContent = game.score; $('turns').textContent = game.turns;
+  $('length').textContent = `${game.track.length} / ${game.maxLength}`;
+  const finished = game.status !== 'playing';
+  $('track-status').textContent = game.status === 'won' ? '全部清空' : game.status === 'lost' ? '超出容量' : game.stoppedTurns ? '停滞中' : game.track.length === game.maxLength ? '轨道已满' : '等待发射';
   $('track-hint').textContent = finished ? '本局已结束，重新开始可以选择新的玩法与关卡。' : '点击编号，将当前球发射到对应间隙。';
-  $('stop-remaining').hidden = !state.stoppedTurns; $('stop-remaining').textContent = `停滞剩余: ${state.stoppedTurns} 回合`;
+  $('stop-remaining').hidden = !game.stoppedTurns; $('stop-remaining').textContent = `停滞剩余: ${game.stoppedTurns} 回合`;
   const track = $('track'); track.replaceChildren();
-  for (let i = 0; i <= state.track.length; ++i) {
+  for (let i = 0; i <= game.track.length; ++i) {
     const gap = document.createElement('button'); gap.className = 'gap'; gap.textContent = i + 1;
     gap.setAttribute('aria-label', `在位置 ${i + 1} 发射`); gap.dataset.position = i + 1;
     gap.addEventListener('click', () => action('shoot', i + 1)); track.append(gap);
-    if (i < state.track.length) track.append(ballColumn(state.track[i]));
+    if (i < game.track.length) track.append(ballColumn(game.track[i]));
   }
-  const space = Math.max(0, state.maxLength - state.track.length);
+  const space = Math.max(0, game.maxLength - game.track.length);
   for (let i = 0; i < Math.min(space, 12); ++i) { const empty = document.createElement('span'); empty.className = 'empty-slot'; empty.setAttribute('aria-hidden', 'true'); track.append(empty); }
-  $('capacity-label').textContent = state.track.length > state.maxLength ? `超出 ${state.track.length - state.maxLength} 格` : `还有 ${space} 格空间`;
-  $('capacity-fill').style.width = `${Math.min(100, state.track.length / state.maxLength * 100)}%`;
-  $('capacity-fill').parentElement.classList.toggle('danger', state.track.length >= state.maxLength);
+  $('capacity-label').textContent = game.track.length > game.maxLength ? `超出 ${game.track.length - game.maxLength} 格` : `还有 ${space} 格空间`;
+  $('capacity-fill').style.width = `${Math.min(100, game.track.length / game.maxLength * 100)}%`;
+  $('capacity-fill').parentElement.classList.toggle('danger', game.track.length >= game.maxLength);
   const feed = $('feed'); feed.replaceChildren();
-  for (const item of state.feed) feed.append(ballColumn(item));
-  if (!state.feed.length) { const empty = document.createElement('span'); empty.className = 'muted'; empty.textContent = '等待区已清空'; feed.append(empty); }
-  $('feed-count').textContent = `剩余 ${state.feed.length} 颗 · 从左向右进入`;
-  $('current-ball').replaceChildren(ball(state.currentBall)); $('next-ball').replaceChildren(ball(state.nextBall));
-  $('result').hidden = !finished; $('result').classList.toggle('lost', state.status === 'lost');
-  $('result-symbol').textContent = state.status === 'won' ? '✧' : '×';
-  $('result-title').textContent = state.status === 'won' ? '回廊已清空，胜利！' : '轨道超过上限，本局结束';
-  $('result-description').textContent = `最终得分 ${state.score} · 完成 ${state.turns} 回合`;
+  for (const item of game.feed) feed.append(ballColumn(item));
+  if (!game.feed.length) { const empty = document.createElement('span'); empty.className = 'muted'; empty.textContent = '等待区已清空'; feed.append(empty); }
+  $('feed-count').textContent = `剩余 ${game.feed.length} 颗 · 从左向右进入`;
+  $('current-ball').replaceChildren(ball(game.currentBall)); $('next-ball').replaceChildren(ball(game.nextBall));
+  $('result').hidden = !finished; $('result').classList.toggle('lost', game.status === 'lost');
+  const badge=document.createElement('img');badge.src=`/assets/icons/ui/${game.status === 'won' ? 'victory' : 'defeat'}.svg`;badge.alt='';
+  $('result-symbol').replaceChildren(badge);
+  $('result-title').textContent = game.status === 'won' ? '回廊已清空，胜利！' : '轨道超过上限，本局结束';
+  $('result-description').textContent = `最终得分 ${game.score} · 完成 ${game.turns} 回合`;
   const events = $('events'); events.replaceChildren();
   const deleted = turnEvents.filter(event => ['eliminate','chain_eliminate'].includes(event.type)).reduce((sum, event) => sum + event.scoreDelta, 0);
   if (deleted) { const p = document.createElement('p'); p.textContent = `消除 ${deleted / 10} 颗彩球，获得 ${deleted} 分。`; events.append(p); }
   for (const message of messages) { const p = document.createElement('p'); p.className = 'effect'; p.textContent = message; events.append(p); }
-  if (!events.childElementCount) events.textContent = state.turns ? '状态已更新。观察轨道，选择下一步。' : '选好位置，开始你的第一步。';
+  if (!events.childElementCount) events.textContent = game.turns ? '状态已更新。观察轨道，选择下一步。' : '选好位置，开始你的第一步。';
   showView('game'); lock();
 }
 function accept(data, authoritative = false) {
@@ -125,7 +136,18 @@ async function mutate(path, extras = {}) {
   const previousSession = state.sessionId;
   try {
     const data = await request(path, {sessionId: state.sessionId, version: state.version, requestId: requestId(), ...extras});
-    accept(data);
+    if (path === '/api/action' && data.events?.length) {
+      messages=[];turnEvents=[];
+      try { await window.ZumaAnimation.play(data.events, snapshot => renderGame({...data.state,...snapshot,status:'playing'})); }
+      catch { notice('动画已略过，当前状态已同步。'); }
+      finally { accept(data); }
+      // Another page may reset or advance the shared game while we animate.
+      // Keep the committed result, then reconcile against the current session.
+      const latest=await request('/api/game');
+      if(latest.state.sessionId!==data.state.sessionId||latest.state.version!==data.state.version) {
+        accept(latest,true);notice('其他页面已改变游戏，已同步当前状态。');
+      }
+    } else accept(data);
   } catch (error) {
     notice(error.api ? error.message : '请求未能确认。正在同步游戏状态，操作不会自动重发。');
     try {
@@ -155,6 +177,7 @@ $('choose-level').addEventListener('click', chooseLevels);
 $('back-mode').addEventListener('click', () => { showView('mode'); notice(); });
 $('discard').addEventListener('click', () => action('discard'));
 $('restart').addEventListener('click', restart); $('result-restart').addEventListener('click', restart);
+$('skip-animation').addEventListener('click',()=>window.ZumaAnimation.finish());
 $('rules-toggle').addEventListener('click', () => $('rules').showModal()); $('rules-close').addEventListener('click', () => $('rules').close());
 $('reconnect').addEventListener('click', async () => {
   busy = true; lock();
@@ -168,4 +191,5 @@ async function init() {
   catch { setConnected(false); notice('暂时无法连接游戏服务，请尝试重新连接。'); }
   finally { busy = false; lock(); }
 }
+for(const element of document.querySelectorAll('.hero-balls .ball'))element.replaceWith(ball(element.textContent.trim()));
 init();

@@ -6,3 +6,22 @@
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 .gap{width:44px;min-width:44px;height:44px;line-height:44px}
 .gap:after{top:44px;left:20px;height:19px}
+body{background:linear-gradient(180deg,#07170acc,#0c1a16c9),url('/assets/backgrounds/courtyard.webp') center/cover fixed no-repeat,var(--bg)}
+.ball{position:relative;isolation:isolate;overflow:hidden}
+.ball-art{position:absolute;inset:0;width:100%;height:100%;z-index:-1;object-fit:contain}
+.ball-letter{position:relative;z-index:1}
+.special-tag{display:flex;align-items:center;gap:3px;white-space:nowrap}
+.special-tag img{width:13px;height:13px;object-fit:contain}
+.feed .special-tag img{width:9px;height:9px}
+.track:before{height:14px;top:60px;background:linear-gradient(#15291cab,#142419b3),url('/assets/track/paving-512x128.jpg') center/128px 32px;border-color:#68765766;box-shadow:0 2px 8px #0007}
+.ammo-current{position:relative;padding-bottom:70px;margin-bottom:0;background:url('/assets/launcher/pedestal.svg') center bottom/220px 220px no-repeat}
+.result-symbol img{width:58px;height:58px;object-fit:contain}
+.animation-controls{min-height:22px;display:flex;gap:16px;align-items:center;justify-content:flex-end;margin-top:16px;font-size:12px;color:var(--gold)}
+.animation-controls .quiet{padding:4px 0;color:var(--jade)}
+.animation-ghost{position:fixed!important;margin:0!important;z-index:50!important;pointer-events:none;transform-origin:top left}
+.sprite-effect{position:fixed;z-index:60;pointer-events:none;background-repeat:no-repeat}
+.sprite-flash{filter:grayscale(1) brightness(1.6)}
+.sprite-ring{filter:sepia(1) saturate(.8)}
+footer a{color:var(--muted);text-decoration:none}footer a:hover{color:var(--gold)}
+body[data-animating=true] .track-scroll{scroll-behavior:auto}
+@media(max-width:740px){body{background-attachment:scroll}.ammo-current{padding-bottom:0;margin-bottom:0;background:none}.animation-controls{margin-top:8px}.special-tag{font-size:9px}.result-symbol img{width:42px;height:42px}}
