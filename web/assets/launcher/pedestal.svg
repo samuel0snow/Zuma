@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs><linearGradient id="stone" x2="0" y2="1"><stop stop-color="#45634b"/><stop offset="1" stop-color="#142d24"/></linearGradient><linearGradient id="gold" x2="0" y2="1"><stop stop-color="#e0c68b"/><stop offset="1" stop-color="#7b6d47"/></linearGradient><radialGradient id="well"><stop stop-color="#122d25"/><stop offset="1" stop-color="#051914"/></radialGradient></defs>
+<ellipse cx="256" cy="405" rx="172" ry="39" fill="#07130f" opacity=".5"/>
+<path d="M98 343L126 401Q256 450 386 401L414 343Z" fill="url(#stone)" stroke="#6c8060" stroke-width="5"/>
+<ellipse cx="256" cy="338" rx="159" ry="61" fill="url(#stone)" stroke="url(#gold)" stroke-width="6"/>
+<path d="M135 291L157 355Q256 390 355 355L377 291Z" fill="url(#stone)" stroke="#53694f" stroke-width="4"/>
+<ellipse cx="256" cy="289" rx="122" ry="47" fill="url(#stone)" stroke="url(#gold)" stroke-width="6"/>
+<ellipse cx="256" cy="283" rx="94" ry="33" fill="url(#well)" stroke="#b7a46a" stroke-width="3"/>
+<path d="M177 334L188 365M215 343L220 374M297 343L292 374M335 334L324 365" stroke="#bdad73" stroke-width="3" opacity=".65"/>
+<path d="M104 340Q256 401 408 340" fill="none" stroke="#789074" stroke-width="4" opacity=".7"/>
+<path d="M250 359L256 351L262 359L256 369Z" fill="#d4be80"/>
+</svg>
