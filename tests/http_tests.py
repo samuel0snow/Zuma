@@ -53,9 +53,21 @@ def main():
                     time.sleep(0.05)
             else:
                 raise RuntimeError("server did not become ready")
-            for asset in ["/", "/style.css", "/app.js"]:
+            for asset in ["/", "/style.css", "/app.js", "/animation.js"]:
                 code, content, hdr = request(asset)
                 assert code == 200 and content and hdr["X-Content-Type-Options"] == "nosniff"
+            for asset, mime in [("/assets/balls/vector/blue.svg", "image/svg+xml"),
+                                ("/assets/icons/ui/back.svg", "image/svg+xml"),
+                                ("/assets/launcher/pedestal.svg", "image/svg+xml"),
+                                ("/assets/backgrounds/courtyard.webp", "image/webp"),
+                                ("/assets/effects/flash-seq/sheet.png", "image/png"),
+                                ("/assets/effects/boom-seq/sheet.png", "image/png"),
+                                ("/assets/effects/ring-seq/sheet.png", "image/png")]:
+                code, content, hdr = request(asset)
+                assert code == 200 and content and hdr["Content-Type"].startswith(mime)
+            assert request("/assets/icons/ui/backZsvg")[0] == 404
+            assert request("/assets/../CMakeLists.txt")[0] == 404
+            assert request("/assets/licenses/kenney-rolling-ball.txt")[0] == 404
             assert request("/../CMakeLists.txt")[0] == 404
             assert request("/api/game", {"x": 1}, {"Origin": "https://example.com"})[0] == 403
             assert request("/api/game", raw=b"{broken")[0] == 400
