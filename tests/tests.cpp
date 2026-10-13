@@ -17,6 +17,27 @@ void invalid(const std::string& source) {
 }
 int main() {
     try {
+        using zuma::Special;
+        zuma::SpecialOptions stopOptions{0, 0, {Special::Stop, Special::None}};
+        zuma::Game stopped(level("RR", "GBYP", "R"), stopOptions);
+        require(stopped.shoot(2) && stopped.track() == "G" && stopped.feed() == "BYP" && stopped.stoppedTurns() == 2, "stop trigger turn grows");
+        require(!stopped.shoot(9) && stopped.stoppedTurns() == 2, "invalid does not consume pause");
+        require(stopped.discard() && stopped.track() == "G" && stopped.stoppedTurns() == 1, "stop first future turn");
+        require(stopped.discard() && stopped.track() == "G" && stopped.stoppedTurns() == 0, "stop second future turn");
+        require(stopped.discard() && stopped.track() == "BG", "growth resumes");
+        zuma::Game backed(level("GBYRR", "P", "R"), {0, 0, {Special::Boom, Special::None, Special::None, Special::Back}});
+        require(backed.shoot(6) && backed.track() == "G" && backed.feed() == "BYP" && backed.score() == 30, "back restores order before feed growth");
+        require(backed.trackBalls()[0].special == Special::Boom, "returned ball retains attribute");
+        zuma::Game bomb(level("GBYRRPG", "", "R"), {0, 0, {Special::None, Special::None, Special::None, Special::Boom}});
+        require(bomb.shoot(5) && bomb.track() == "G" && bomb.score() == 70, "boom radius at pre-deletion position");
+        zuma::Game bombChain(level("RRBGYPBG", "", "R"), {0, 0, {Special::None, Special::Boom, Special::None, Special::Boom, Special::Stop}});
+        require(bombChain.shoot(2) && bombChain.track() == "G" && bombChain.score() == 80 && bombChain.stoppedTurns() == 2, "boom reaches another bomb and stop");
+        zuma::Game smallBack(level("GRR", "", "R"), {0, 0, {Special::None, Special::Back}});
+        require(smallBack.shoot(4) && smallBack.track() == "G" && smallBack.feed().empty(), "back fewer than three");
+        zuma::Game randomA(level("RGBYP", "RGB", "R"), {100, 123, {}});
+        zuma::Game randomB(level("RGBYP", "RGB", "R"), {100, 123, {}});
+        for (std::size_t i = 0; i < 5; ++i)
+            require(randomA.trackBalls()[i].special != Special::None && randomA.trackBalls()[i].special == randomB.trackBalls()[i].special, "seeded random attributes");
         zuma::Game normal(level("RR", "", "R"));
         require(normal.shoot(2) && normal.track().empty() && normal.score() == 30 && normal.status() == zuma::Status::Won, "normal elimination");
         require(!normal.discard() && !normal.shoot(1) && normal.turns() == 1, "finished game mutation");
