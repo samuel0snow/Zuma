@@ -85,12 +85,13 @@ void Game::eliminate(std::list<Ball>::iterator ball) {
                         const auto newEnd = std::min(nodes.size(), i + 4);
                         if (newStart < start) { start = newStart; expanded = true; }
                         if (newEnd > end) { end = newEnd; expanded = true; }
-                        events_.push_back("Boom：炸弹清除左右各 3 格，范围内属性也会触发。");
+                        events_.push_back("Boom: 炸弹清除 第" + std::to_string(newStart + 1)
+                                          + "格到第" + std::to_string(newEnd) + "格");
                         break;
                     }
                     case Special::Stop:
                         pendingStop_ += 2;
-                        events_.push_back("Stop：接下来两个回合暂停等待球进入。");
+                        events_.push_back("Stop: 停滞效果生效，增加 2 回合");
                         break;
                     case Special::Back: ++pendingBack_; break;
                     default: break;
@@ -118,10 +119,10 @@ void Game::finishTurn() {
         }
         while (!feed_.empty()) { restored.push(feed_.front()); feed_.pop(); }
         feed_.swap(restored);
-        events_.push_back("Back：" + std::to_string(count) + " 个球已按原顺序退回等待区前端。");
+        events_.push_back("Back: 彩球回退" + std::to_string(count) + "格");
     }
     // A newly triggered Stop starts on the following turn, not this one.
-    if (stoppedTurns_ > 0) { --stoppedTurns_; events_.push_back("停滞中：本回合不加入等待球。"); }
+    if (stoppedTurns_ > 0) { --stoppedTurns_; events_.push_back("Stop: 本回合停滞中"); }
     else if (!feed_.empty()) {
         auto ball = feed_.front(); feed_.pop();
         // Returned balls keep their original attribute; new feed balls roll once.

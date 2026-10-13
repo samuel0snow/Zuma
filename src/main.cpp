@@ -34,6 +34,19 @@ void printBall(char ball) {
     if (colorEnabled && *color) std::cout << color << ball << "\033[0m";
     else std::cout << ball;
 }
+void printEffect(const std::string& text) {
+    if (colorEnabled) std::cout << "\033[91m";
+    std::cout << text;
+    if (colorEnabled) std::cout << "\033[0m";
+}
+void displaySpecialHelp() {
+    std::cout << "\n特殊属性说明（属性球被消除时触发）:\n\n"
+              << "  Back: 最前端最多 3 个彩球退回等待区，随后照常执行本回合增长。\n"
+              << "  Stop: 后续两个有效回合暂停增长，多次触发可叠加。\n"
+              << "  Boom: 清除自身及左右各 3 格，范围内其他属性也会触发。\n\n"
+              << "初始轨道球及首次入轨的等待球有 20% 概率携带属性。\n"
+              << "属性显示在对应彩球下方；发射球不携带属性。\n\n";
+}
 void displayResult(const zuma::Game& game) {
     const bool won = game.status() == zuma::Status::Won;
     std::cout << "\n\n";
@@ -76,7 +89,10 @@ void display(const zuma::Game& game, int level) {
         const auto padding = (cellWidth - 1 - name.size()) / 2;
         std::cout << std::string(padding, ' ') << name << std::string(cellWidth - padding - name.size(), ' ');
     }
-    if (game.stoppedTurns()) std::cout << "\n\n停滞剩余: " << game.stoppedTurns() << " 回合";
+    if (game.stoppedTurns()) {
+        std::cout << "\n\n";
+        printEffect("停滞剩余: " + std::to_string(game.stoppedTurns()) + " 回合");
+    }
     std::cout << "\n\n当前球 | ";
     printBall(game.currentBall());
     std::cout << " |    下一球 | ";
@@ -108,7 +124,20 @@ int main(int argc, char** argv) {
     }
     std::cout << "祖玛 CLI — R红 G绿 B蓝 Y黄 P紫\n";
     std::string command;
+    bool chooseMode = true;
+    bool specialsEnabled = false;
     while (true) {
+        if (chooseMode) {
+            std::cout << "\n是否添加特殊属性？\n1. 添加特殊属性\n2. 普通模式（不添加）\n输入 1 或 2，或 exit 退出: " << std::flush;
+            if (!std::getline(std::cin, command)) return 0;
+            command = zuma::trim(command);
+            if (command.compare(0, 3, "\xEF\xBB\xBF") == 0) command = zuma::trim(command.substr(3));
+            if (command == "exit") return 0;
+            if (command != "1" && command != "2") { std::cout << "请输入 1 或 2。\n"; continue; }
+            specialsEnabled = command == "1";
+            chooseMode = false;
+            if (specialsEnabled) displaySpecialHelp();
+        }
         std::cout << "\n关卡列表:\n1. level1.txt\n2. level2.txt\n输入关卡编号，或 exit 退出: " << std::flush;
         if (!std::getline(std::cin, command)) break;
         command = zuma::trim(command);
@@ -120,32 +149,39 @@ int main(int argc, char** argv) {
         }
         try {
             zuma::SpecialOptions options;
-            options.chancePercent = 20;
+            options.chancePercent = specialsEnabled ? 20 : 0;
             options.seed = static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
             zuma::Game game(zuma::loadLevel(directory + "/level" + std::to_string(selection) + ".txt"), options);
             display(game, static_cast<int>(selection));
             while (game.status() == zuma::Status::Playing) {
-                std::cout << "输入位置发射，输入 q 丢弃，输入 exit 退出: " << std::flush;
+                std::cout << "输入位置发射，输入 q 丢弃，输入 restart 重启游戏，输入 exit 退出: " << std::flush;
                 if (!std::getline(std::cin, command)) return 0;
                 command = zuma::trim(command);
                 if (command == "exit") { std::cout << "已主动退出。\n"; return 0; }
+                if (command == "restart") {
+                    chooseMode = true;
+                    specialsEnabled = false;
+                    std::cout << "\n已重启游戏，返回属性选择。\n";
+                    break;
+                }
                 std::size_t position = 0;
                 const auto before = game.score();
                 bool valid = command == "q" ? game.discard()
                     : zuma::parsePositive(command, position) && game.shoot(position);
-                if (!valid) { std::cout << "无效操作：请输入 1 至 " << game.track().size() + 1 << " 的整数、q 或 exit。\n"; continue; }
+                if (!valid) { std::cout << "无效操作：请输入 1 至 " << game.track().size() + 1 << " 的整数、q、restart 或 exit。\n"; continue; }
                 if (game.score() > before) std::cout << "消除 " << (game.score() - before) / 10 << " 个球，获得 " << game.score() - before << " 分。\n";
-                for (const auto& event : game.events()) std::cout << event << '\n';
+                for (const auto& event : game.events()) { printEffect(event); std::cout << '\n'; }
                 display(game, static_cast<int>(selection));
             }
+            if (chooseMode) continue;
             displayResult(game);
             while (true) {
-                std::cout << "输入 r 重新选择关卡，或 exit 退出: " << std::flush;
+                std::cout << "输入 restart 重启游戏，输入 r 重新选择关卡，或 exit 退出: " << std::flush;
                 if (!std::getline(std::cin, command)) return 0;
                 command = zuma::trim(command);
                 if (command == "exit") return 0;
-                if (command == "r") break;
-                std::cout << "请输入 r 或 exit。\n";
+                if (command == "r" || command == "restart") { chooseMode = true; specialsEnabled = false; break; }
+                std::cout << "请输入 restart、r 或 exit。\n";
             }
         } catch (const std::exception& error) { std::cout << "关卡读取失败: " << error.what() << '\n'; }
     }

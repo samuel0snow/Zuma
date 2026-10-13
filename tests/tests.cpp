@@ -23,13 +23,16 @@ int main() {
         require(stopped.shoot(2) && stopped.track() == "G" && stopped.feed() == "BYP" && stopped.stoppedTurns() == 2, "stop trigger turn grows");
         require(!stopped.shoot(9) && stopped.stoppedTurns() == 2, "invalid does not consume pause");
         require(stopped.discard() && stopped.track() == "G" && stopped.stoppedTurns() == 1, "stop first future turn");
+        require(stopped.events().back() == "Stop: 本回合停滞中", "short stop event");
         require(stopped.discard() && stopped.track() == "G" && stopped.stoppedTurns() == 0, "stop second future turn");
         require(stopped.discard() && stopped.track() == "BG", "growth resumes");
         zuma::Game backed(level("GBYRR", "P", "R"), {0, 0, {Special::Boom, Special::None, Special::None, Special::Back}});
         require(backed.shoot(6) && backed.track() == "G" && backed.feed() == "BYP" && backed.score() == 30, "back restores order before feed growth");
+        require(backed.events().back() == "Back: 彩球回退3格", "short back event");
         require(backed.trackBalls()[0].special == Special::Boom, "returned ball retains attribute");
         zuma::Game bomb(level("GBYRRPG", "", "R"), {0, 0, {Special::None, Special::None, Special::None, Special::Boom}});
         require(bomb.shoot(5) && bomb.track() == "G" && bomb.score() == 70, "boom radius at pre-deletion position");
+        require(bomb.events().front() == "Boom: 炸弹清除 第1格到第7格", "boom actual range event");
         zuma::Game bombChain(level("RRBGYPBG", "", "R"), {0, 0, {Special::None, Special::Boom, Special::None, Special::Boom, Special::Stop}});
         require(bombChain.shoot(2) && bombChain.track() == "G" && bombChain.score() == 80 && bombChain.stoppedTurns() == 2, "boom reaches another bomb and stop");
         zuma::Game smallBack(level("GRR", "", "R"), {0, 0, {Special::None, Special::Back}});
