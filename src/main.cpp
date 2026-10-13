@@ -8,15 +8,25 @@
 void display(const zuma::Game& game, int level) {
     const auto track = game.track();
     const auto feed = game.feed();
+    // Keep every label's first digit directly above its insertion boundary.
+    const auto digits = std::to_string(track.size() + 1).size();
+    const std::size_t cellWidth = digits + 1 > 4 ? digits + 1 : 4;
     std::cout << "\n关卡: " << level << "    得分: " << game.score() << "    回合数: " << game.turns()
-              << "\n轨道长度: " << track.size() << " / " << game.maxLength() << '\n' << '|';
-    for (char ball : track) std::cout << ball << '|';
-    for (auto i = track.size(); i < game.maxLength(); ++i) std::cout << " |";
-    std::cout << "\n插入位置:";
-    for (std::size_t i = 1; i <= track.size() + 1; ++i) std::cout << ' ' << i;
-    std::cout << "\n当前球 |" << game.currentBall() << "|    下一球 |" << game.nextBall()
-              << "|\n等待区: " << (feed.empty() ? "（空）" : feed)
-              << "（剩余 " << feed.size() << " 个）\n";
+              << "\n轨道长度: " << track.size() << " / " << game.maxLength()
+              << "\n\n插入位置（对应下方竖线）:\n\n  ";
+    for (std::size_t i = 1; i <= track.size() + 1; ++i) {
+        const auto label = std::to_string(i);
+        std::cout << label << std::string(cellWidth - label.size(), ' ');
+    }
+    std::cout << "\n  |";
+    const auto slots = track.size() > game.maxLength() ? track.size() : game.maxLength();
+    for (std::size_t i = 0; i < slots; ++i) {
+        std::cout << ' ' << (i < track.size() ? track[i] : ' ')
+                  << std::string(cellWidth - 3, ' ') << '|';
+    }
+    std::cout << "\n\n当前球 | " << game.currentBall() << " |    下一球 | " << game.nextBall()
+              << " |\n\n等待区: " << (feed.empty() ? "（空）" : feed)
+              << "（剩余 " << feed.size() << " 个）\n\n";
 }
 int main(int argc, char** argv) {
 #ifdef _WIN32
