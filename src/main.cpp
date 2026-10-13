@@ -11,7 +11,9 @@ void display(const zuma::Game& game, int level) {
     // Keep every label's first digit directly above its insertion boundary.
     const auto digits = std::to_string(track.size() + 1).size();
     const std::size_t cellWidth = digits + 1 > 4 ? digits + 1 : 4;
-    std::cout << "\n关卡: " << level << "    得分: " << game.score() << "    回合数: " << game.turns()
+    std::cout << "--------------------------------------------------------------------\n\n\n"
+              << "--------------------------------------------------------------------\n"
+              << "关卡: " << level << "    得分: " << game.score() << "    回合数: " << game.turns()
               << "\n轨道长度: " << track.size() << " / " << game.maxLength()
               << "\n\n插入位置（对应下方竖线）:\n\n  ";
     for (std::size_t i = 1; i <= track.size() + 1; ++i) {
