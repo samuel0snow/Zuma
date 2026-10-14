@@ -77,7 +77,7 @@ Json GameApi::state() const {
     result["version"] = version_;
     result["levelId"] = levelId_;
     result["specialsEnabled"] = specialsEnabled_;
-    result["specialChancePercent"] = specialsEnabled_ ? 10 : 0;
+    result["specialChancePercent"] = specialsEnabled_ ? 30 : 0;
     result["seed"] = seed_;
     result["maxLength"] = game_ ? game_->maxLength() : 0;
     result["lastRequestId"] = lastRequestId_;
@@ -90,7 +90,7 @@ ApiResponse GameApi::handle(const std::string& method, const std::string& path, 
         if (method == "GET" && path == "/api/levels") {
             Json levels = Json::array();
             for (int id : {1, 2}) {
-                Json item{{"id", id}, {"title", id == 1 ? "回声之环" : "五色回廊"}};
+                Json item{{"id", id}, {"title", "关卡 " + std::to_string(id)}};
                 try {
                     auto level = loader_(id); resourceCheck(level);
                     Game validate(level);
@@ -132,7 +132,7 @@ ApiResponse GameApi::handle(const std::string& method, const std::string& path, 
             try { level = loader_(static_cast<int>(id)); }
             catch (const std::exception& error) { throw ApiError(422, "LEVEL_LOAD_FAILED", error.what()); }
             resourceCheck(level);
-            auto next = std::make_unique<Game>(level, SpecialOptions{specials ? 10U : 0U, seed, {}});
+            auto next = std::make_unique<Game>(level, SpecialOptions{specials ? 30U : 0U, seed, {}});
             game_ = std::move(next); levelId_ = static_cast<int>(id); seed_ = seed; specialsEnabled_ = specials;
             sessionId_ = newSession();
         } else if (path == "/api/reset") {

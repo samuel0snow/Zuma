@@ -8,16 +8,16 @@ int main(int argc, char** argv) {
     auto add = [&](const std::string& name, zuma::Level level, zuma::SpecialOptions options, std::size_t position) {
         zuma::Game game(level, options);
         auto initial=zuma::snapshotJson(game.snapshot());
-        initial.update({{"sessionId","fixture-"+name},{"version",1},{"levelId",1},{"maxLength",level.maxLength},{"specialsEnabled",!options.initialAttributes.empty()},{"specialChancePercent",10}});
+        initial.update({{"sessionId","fixture-"+name},{"version",1},{"levelId",1},{"maxLength",level.maxLength},{"specialsEnabled",!options.initialAttributes.empty()},{"specialChancePercent",30}});
         if (position) game.shoot(position); else game.discard();
         auto final=zuma::snapshotJson(game.snapshot());
-        final.update({{"sessionId","fixture-"+name},{"version",2},{"levelId",1},{"maxLength",level.maxLength},{"specialsEnabled",!options.initialAttributes.empty()},{"specialChancePercent",10}});
+        final.update({{"sessionId","fixture-"+name},{"version",2},{"levelId",1},{"maxLength",level.maxLength},{"specialsEnabled",!options.initialAttributes.empty()},{"specialChancePercent",30}});
         fixtures[name]={{"initial",initial},{"response",{{"state",final},{"events",zuma::turnEventsJson(game)},{"messages",game.events()}}}};
         if (name=="stop") {
             auto before=final;
             game.discard();
             auto after=zuma::snapshotJson(game.snapshot());
-            after.update({{"sessionId","fixture-stop-skip"},{"version",3},{"levelId",1},{"maxLength",level.maxLength},{"specialsEnabled",true},{"specialChancePercent",10}});
+            after.update({{"sessionId","fixture-stop-skip"},{"version",3},{"levelId",1},{"maxLength",level.maxLength},{"specialsEnabled",true},{"specialChancePercent",30}});
             before["sessionId"]="fixture-stop-skip";
             fixtures["stop-skip"]={{"initial",before},{"response",{{"state",after},{"events",zuma::turnEventsJson(game)},{"messages",game.events()}}}};
         }

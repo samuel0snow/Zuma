@@ -89,7 +89,7 @@ def main():
             assert code == 200 and reset["state"]["status"] == "ready"
             assert post("/api/action", state, "old", type="discard")[0] == 409
             code, second, _ = post("/api/game", reset["state"], "second", levelId=2, specialsEnabled=True, seed=7)
-            assert code == 200 and second["state"]["specialChancePercent"] == 10
+            assert code == 200 and second["state"]["specialChancePercent"] == 30
             command = dict(sessionId=second["state"]["sessionId"], version=second["state"]["version"], requestId="concurrent", type="discard")
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
                 replies = list(pool.map(lambda _: request("/api/action", command), range(4)))

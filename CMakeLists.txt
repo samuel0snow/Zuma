@@ -35,7 +35,7 @@ endif()
 add_custom_command(TARGET zuma POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:zuma>/levels"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_SOURCE_DIR}/Zuma/level1.txt" "${CMAKE_SOURCE_DIR}/Zuma/level2.txt"
+    "${CMAKE_SOURCE_DIR}/levels/level1.txt" "${CMAKE_SOURCE_DIR}/levels/level2.txt"
     "$<TARGET_FILE_DIR:zuma>/levels"
   VERBATIM)
 enable_testing()
@@ -62,7 +62,7 @@ endif()
 set(ZUMA_GUI_ASSET_COMMANDS
   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:zuma_gui>/levels"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_SOURCE_DIR}/Zuma/level1.txt" "${CMAKE_SOURCE_DIR}/Zuma/level2.txt"
+    "${CMAKE_SOURCE_DIR}/levels/level1.txt" "${CMAKE_SOURCE_DIR}/levels/level2.txt"
     "$<TARGET_FILE_DIR:zuma_gui>/levels"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/web" "$<TARGET_FILE_DIR:zuma_gui>/web"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/third_party" "$<TARGET_FILE_DIR:zuma_gui>/third_party")

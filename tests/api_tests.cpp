@@ -54,7 +54,7 @@ int main() {
             auto initial = service.handle("GET", "/api/game").body["state"];
             auto create = mutation(initial, "create"); create.update({{"levelId",id},{"specialsEnabled",special},{"seed",123}});
             auto served = service.handle("POST", "/api/game", create).body["state"];
-            Game core(sample(id), {special ? 10U : 0U,123,{}});
+            Game core(sample(id), {special ? 30U : 0U,123,{}});
             auto compare = [&](const Json& serverState) {
                 const auto expected = snapshotJson(core.snapshot());
                 for (auto it = expected.begin(); it != expected.end(); ++it)

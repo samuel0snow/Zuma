@@ -68,7 +68,7 @@ void displaySpecialHelp() {
               << "  Back: 最前端最多 3 个彩球退回等待区，随后照常执行本回合增长。\n"
               << "  Stop: 后续两个有效回合暂停增长，多次触发可叠加。\n"
               << "  Boom: 清除自身及左右各 3 格，范围内其他属性也会触发。\n\n"
-              << "初始轨道球及首次入轨的等待球有 10% 概率携带属性。\n"
+              << "初始轨道球及首次入轨的等待球有 30% 概率携带属性（Back、Stop、Boom 各 10%）。\n"
               << "属性显示在对应彩球下方；发射球不携带属性。\n\n";
 }
 void displayResult(const zuma::Game& game) {
@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
         const std::string executable = argv[0];
         const auto separator = executable.find_last_of("/\\");
         const auto executableDir = separator == std::string::npos ? std::string(".") : executable.substr(0, separator);
-        for (const auto& candidate : {executableDir + "/levels", std::string("Zuma"), std::string("levels")}) {
+        for (const auto& candidate : {executableDir + "/levels", std::string("levels")}) {
             std::ifstream probe(candidate + "/level1.txt");
             if (probe.is_open()) { directory = candidate; break; }
         }
@@ -179,7 +179,7 @@ int main(int argc, char** argv) {
         }
         try {
             zuma::SpecialOptions options;
-            options.chancePercent = specialsEnabled ? 10 : 0;
+            options.chancePercent = specialsEnabled ? 30 : 0;
             options.seed = static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
             zuma::Game game(zuma::loadLevel(directory + "/level" + std::to_string(selection) + ".txt"), options);
             display(game, static_cast<int>(selection));
