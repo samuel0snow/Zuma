@@ -19,7 +19,7 @@ def copy(source, target):
 
 def runtime_web(source, target):
     target.mkdir(parents=True, exist_ok=True)
-    for name in ["index.html","style.css","app.js","animation.js"]:
+    for name in ["index.html","style.css","app.js","animation.js","stage.js"]:
         copy(source/name,target/name)
     for name in ["backgrounds","launcher","balls/vector","balls/gemstone","icons/ui","track","licenses"]:
         copy(source/"assets"/name,target/"assets"/name)

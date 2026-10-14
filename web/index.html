@@ -8,6 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="stylesheet" href="/style.css">
   <script src="/animation.js" defer></script>
+  <script src="/stage.js" defer></script>
   <script src="/app.js" defer></script>
 </head>
 <body>
@@ -26,56 +27,75 @@
           <div class="intro-copy">
             <p class="eyebrow">一颗彩球，一次连锁</p>
             <h1 id="mode-heading">让色彩相遇。<br><em>让回廊归于宁静。</em></h1>
-            <p class="lead">把手中的彩球送入轨道，连起三个同色球。<br>消除之后，新的相遇还会继续。</p>
+            <p class="lead">将彩球送入间隙，连起三个同色球。</p>
             <div class="hero-balls" aria-hidden="true"><span class="ball color-R">R</span><span class="ball color-G">G</span><span class="ball color-B">B</span><span class="ball color-Y">Y</span><span class="ball color-P">P</span></div>
-            <p class="intro-note">无需赶时间。观察、选择，然后发射。</p>
           </div>
           <div class="selection-panel">
-            <div class="section-heading"><span class="step">01</span><div><p class="eyebrow">开始之前</p><h2>选择你的玩法</h2></div></div>
+            <div class="section-heading"><div><p class="eyebrow">开始之前</p><h2>选择你的玩法</h2></div></div>
             <button class="mode-card" data-mode="normal" aria-pressed="true"><span class="mode-icon" aria-hidden="true">○</span><span><strong>经典模式</strong><small>专注颜色与连锁，熟悉每一步。</small></span><span class="choice-mark" aria-hidden="true">✓</span></button>
             <button class="mode-card" data-mode="special" aria-pressed="false"><span class="mode-icon" aria-hidden="true">✦</span><span><strong>特殊属性模式</strong><small>三种属性各 10% 的惊喜，让轨道多一点变化。</small></span><span class="choice-mark" aria-hidden="true">✓</span></button>
             <div id="special-help" class="special-help" hidden>
-              <p>带属性的彩球被消除时，触发对应效果：</p>
-              <dl><div><dt>Back · 回退</dt><dd>前三颗球退回等待区，随后照常增长。</dd></div><div><dt>Stop · 停滞</dt><dd>后续两个有效回合暂停增长，可叠加。</dd></div><div><dt>Boom · 爆破</dt><dd>清除自身及左右各三格，也可引爆其他属性。</dd></div></dl>
-              <small>初始球和首次入轨的等待球有 30% 概率携带属性（Back、Stop、Boom 各 10%）；发射球无属性。</small>
+              <dl><div><dt>Back</dt><dd>前三颗球回退。</dd></div><div><dt>Stop</dt><dd>暂停增长两回合。</dd></div><div><dt>Boom</dt><dd>清除左右各三格。</dd></div></dl>
+              <small>各属性 10%，总概率 30%；消除时触发。完整规则见“玩法说明”。</small>
             </div>
-            <button id="choose-level" class="primary wide">选择关卡 <span aria-hidden="true">→</span></button>
-            <p class="panel-note">每次有效操作后，等待区会进入一个彩球。</p>
+            <button id="choose-level" class="primary wide">选择地图 <span aria-hidden="true">→</span></button>
           </div>
+        </div>
+      </section>
+
+      <section id="map-page" aria-labelledby="map-heading" hidden>
+        <div class="page-heading"><div><p class="eyebrow">02 / 选择地图</p><h1 id="map-heading">选择一条回廊</h1><p id="map-mode" class="muted"></p></div><button id="back-mode" class="quiet">← 返回玩法选择</button></div>
+        <div class="map-list">
+          <button class="map-card" data-map="straight"><svg viewBox="0 0 320 180" aria-hidden="true"><path d="M25 55 H295"/><circle cx="160" cy="140" r="14"/></svg><strong>直线地图</strong><span>一目了然的轨道 · 底部居中发射</span></button>
+          <button class="map-card" data-map="spiral"><svg viewBox="0 0 320 180" aria-hidden="true"><path d="M292 24 C315 150 230 174 139 161 C25 145 14 36 115 20 C205 2 275 54 255 115 C238 160 107 147 92 93 C78 42 175 37 205 67"/><circle cx="163" cy="95" r="14"/></svg><strong>螺旋类环形地图</strong><span>盘绕的开放轨道 · 中心发射</span></button>
+          <button class="map-card" data-map="s"><svg viewBox="0 0 320 180" aria-hidden="true"><path d="M285 25 H78 C5 25 5 75 78 75 H242 C315 75 315 125 242 125 H35"/><circle cx="160" cy="157" r="14"/></svg><strong>S 形地图</strong><span>两次弯折的轨道 · 下方发射</span></button>
         </div>
       </section>
 
       <section id="level-page" aria-labelledby="level-heading" hidden>
-        <div class="page-heading"><div><p class="eyebrow">02 / 选择挑战</p><h1 id="level-heading">走进五色回廊</h1><p id="selected-mode" class="muted">经典模式</p></div><button id="back-mode" class="quiet">← 返回玩法选择</button></div>
+        <div class="page-heading"><div><p class="eyebrow">03 / 选择挑战</p><h1 id="level-heading">走进五色回廊</h1><p id="selected-mode" class="muted">经典模式</p></div><button id="back-map" class="quiet">← 返回地图选择</button></div>
         <div id="level-list" class="level-list"></div>
-        <p class="footnote">从球之间的间隙发射。轨道达到容量时，仍有机会用一次消除扭转局面。</p>
       </section>
 
       <section id="game-page" aria-labelledby="game-heading" hidden>
         <div class="animation-controls"><span id="animation-status" role="status" aria-live="polite"></span><button id="skip-animation" class="quiet" hidden>跳过动画 →</button></div>
-        <div class="page-heading game-heading"><div><p id="game-mode" class="eyebrow">经典模式</p><h1 id="game-heading">关卡 1</h1></div><button id="restart" class="quiet">↺ 重启游戏</button></div>
-        <div class="stats"><div><span>得分</span><strong id="score">0</strong></div><div><span>已完成回合</span><strong id="turns">0</strong></div><div><span>轨道长度 / 容量</span><strong id="length">0 / 12</strong></div><div class="status-stat"><span>轨道状态</span><strong id="track-status">等待发射</strong></div></div>
-
-        <div id="result" class="result" role="status" hidden><span id="result-symbol" class="result-symbol" aria-hidden="true"></span><div><p class="eyebrow">本局结束</p><h2 id="result-title"></h2><p id="result-description"></p></div><button id="result-restart" class="primary">重新开始 →</button></div>
+        <div class="page-heading game-heading"><div><p id="game-mode" class="eyebrow">经典模式</p><h1 id="game-heading">关卡 1</h1></div><div class="game-actions"><button id="finish-game" class="quiet" type="button">结束本局</button><button id="restart" class="quiet">↺ 重启游戏</button></div></div>
+        <div class="stats"><div><span>得分</span><strong id="score">0</strong></div><div><span>回合</span><strong id="turns">0</strong></div><div class="status-stat"><strong id="track-status">等待发射</strong></div></div>
 
         <div class="game-layout">
           <div class="board-panel">
-            <div class="board-heading"><h2>彩球轨道</h2><span id="stop-remaining" class="effect" hidden></span></div>
-            <p id="track-hint" class="muted">点击编号，将当前球发射到对应间隙。</p>
-            <div class="track-scroll" aria-label="完整彩球轨道"><div id="track" class="track"></div></div>
-            <div class="capacity"><span id="capacity-label">还有 6 格空间</span><div class="capacity-bar"><div id="capacity-fill"></div></div></div>
-            <div class="feed-header"><h3>等待区</h3><span id="feed-count" class="muted"></span></div>
-            <div id="feed" class="feed" tabindex="0" aria-label="等待入轨的彩球"></div>
-            <p class="footnote">等待球从轨道最前端进入。轨道和等待区全部清空，即获胜。</p>
+            <div class="board-heading"><h2>彩球轨道 <span id="length">0 / 12</span></h2><span id="stop-remaining" class="effect" hidden></span></div>
+            <p id="track-hint" class="muted">移动鼠标瞄准，点击舞台发射。</p>
+            <div id="game-stage" class="game-stage" tabindex="0" role="group" aria-label="游戏舞台：移动鼠标瞄准，点击发射；方向键瞄准，空格发射">
+              <div id="stage-scene" class="stage-scene">
+                <svg id="stage-path" class="stage-path" aria-hidden="true"></svg>
+                <div id="track" class="track stage-track"></div>
+                <div class="stage-launcher"><div class="ammo-current"><div id="current-ball" aria-label="当前彩球"></div></div></div>
+                <svg id="aim-overlay" class="aim-overlay" aria-hidden="true"></svg>
+                <div id="stage-effects" class="stage-effects" aria-hidden="true"></div>
+              </div>
+              <span id="aim-status" class="aim-status" role="status">移动鼠标瞄准</span>
+            </div>
           </div>
-          <aside class="ammo-panel" aria-labelledby="ammo-heading"><p class="eyebrow">你的下一步</p><h2 id="ammo-heading">发射台</h2><div class="ammo-current"><span class="muted">当前彩球</span><div id="current-ball"></div></div><div class="ammo-next"><span class="muted">下一颗</span><div id="next-ball"></div></div><button id="discard" class="secondary wide">丢弃当前球</button><p class="panel-note">丢弃也算一个回合，轨道仍会增长。</p></aside>
+          <aside class="game-sidebar" aria-label="游戏信息与操作">
+            <div id="result" class="result" role="status" hidden><span id="result-symbol" class="result-symbol" aria-hidden="true"></span><div><p class="eyebrow">本局结束</p><h2 id="result-title"></h2><p id="result-description"></p></div><button id="result-recap" class="secondary" type="button">查看复盘 ↓</button><button id="result-restart" class="primary">重新开始 →</button></div>
+            <section class="game-resources" aria-label="待入轨与发射彩球">
+              <div class="feed-header"><h3>等待区</h3><span id="feed-count" class="muted"></span></div>
+              <div id="feed" class="feed" tabindex="0" aria-label="等待入轨的彩球"></div>
+              <div class="ammo-panel" aria-label="下一颗彩球与丢弃操作"><div class="ammo-next"><span class="muted">下一颗</span><div id="next-ball"></div></div><button id="discard" class="secondary">丢弃当前球</button></div>
+            </section>
+            <section class="events-panel" aria-labelledby="events-heading"><h2 id="events-heading">本回合</h2><div id="events" role="status" aria-live="polite">选好位置，开始你的第一步。</div><details id="event-details" hidden><summary>查看回合详情</summary><div id="event-list"></div></details></section>
+          </aside>
         </div>
-        <section class="events-panel" aria-labelledby="events-heading"><h2 id="events-heading">本回合</h2><div id="events" role="status" aria-live="polite">选好位置，开始你的第一步。</div></section>
+        <section id="turn-replay" class="turn-replay" hidden aria-labelledby="turn-replay-heading">
+          <div class="replay-titlebar"><div><p class="eyebrow">本局回放</p><h2 id="turn-replay-heading">回合流程</h2><p id="replay-summary" class="muted"></p></div><button id="close-replay" class="quiet" type="button">收起</button></div>
+          <div id="replay-flow" class="replay-flow" aria-label="按时间顺序排列的回合状态与事件"></div>
+        </section>
       </section>
     </main>
 
-    <footer><span>ZUMA / 五色回廊</span><span>红 · 绿 · 蓝 · 黄 · 紫</span><a href="/assets/CREDITS.md" target="_blank" rel="noopener">素材来源与署名</a></footer>
+    <footer><span>ZUMA / 五色回廊</span><a href="/assets/CREDITS.md" target="_blank" rel="noopener">素材来源与署名</a></footer>
   </div>
-  <dialog id="rules"><div class="dialog-heading"><p class="eyebrow">玩法说明</p><button id="rules-close" class="quiet" aria-label="关闭玩法说明">关闭 ×</button></div><h2>每一步，都有新的可能。</h2><ol><li>点击轨道间隙的编号，将当前球插入该位置。</li><li>三个或更多同色球连在一起时，整段消除；断口相接还能继续连锁。每消除一球得 10 分。</li><li>每次发射或丢弃后，一个等待球从轨道最前端进入；入轨本身不消除。</li><li>轨道和等待区同时为空则胜利；完成回合后长度超过容量则失败。</li><li>重启会返回玩法选择，并清除本局进度。</li></ol><h3>特殊属性模式</h3><p>Back、Stop、Boom 各有 10% 出现概率，总概率为 30%，被消除时触发。</p><dl><div><dt>Back</dt><dd>最多前三颗球按原顺序退回等待区，保留属性；本回合仍正常增长。</dd></div><div><dt>Stop</dt><dd>后续两个有效回合不加入等待球，多次触发累加。</dd></div><div><dt>Boom</dt><dd>清除自身和左右各三格，端点截断，范围内的属性也触发。</dd></div></dl></dialog>
+  <dialog id="rules"><div class="dialog-heading"><p class="eyebrow">玩法说明</p><button id="rules-close" class="quiet" aria-label="关闭玩法说明">关闭 ×</button></div><h2>每一步，都有新的可能。</h2><ol><li>移动鼠标瞄准，点击舞台发射。射线最先碰到的球或相邻两球之间的间隙决定插入位置；球心分界线平局选择轨道正方向侧。</li><li>未命中时，球飞向舞台边缘后弃用，完整结算一个回合。方向键调整瞄准，空格或 Enter 发射。</li><li>三个或更多同色球连在一起时，整段消除；断口相接还能继续连锁。每消除一球得 10 分。</li><li>每次发射或丢弃后，一个等待球从轨道最前端进入；入轨本身不消除。</li><li>轨道和等待区同时为空则胜利；完成回合后长度超过容量则失败。三张地图都是开放轨道，首尾不相邻。</li><li>结束本局后可以查看各回合实际状态与事件；重启返回玩法选择并清除本局进度及复盘。</li></ol><h3>特殊属性模式</h3><p>Back、Stop、Boom 各有 10% 出现概率，总概率为 30%，被消除时触发。</p><dl><div><dt>Back</dt><dd>最多前三颗球按原顺序退回等待区，保留属性；本回合仍正常增长。</dd></div><div><dt>Stop</dt><dd>后续两个有效回合不加入等待球，多次触发累加。</dd></div><div><dt>Boom</dt><dd>清除自身和左右各三格，端点截断，范围内的属性也触发。</dd></div></dl></dialog>
 </body>
 </html>

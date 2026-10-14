@@ -4,12 +4,12 @@ window.ZumaAnimation = (() => {
   let skip = false;
   const active = new Set();
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const names = {insert:'彩球发射',discard:'丢弃当前球',eliminate:'同色消除',chain_eliminate:'连锁消除',boom:'Boom · 爆破',stop_trigger:'Stop · 停滞生效',back:'Back · 彩球回退',stop_skip:'Stop · 本回合停滞中',feed:'等待球入轨',ammo_update:'弹药更新',turn_end:'回合结束',won:'胜利',lost:'本局结束'};
+  const names = {insert:'彩球发射',discard:'丢弃当前球',spit:'吐球 · 弃用当前球',eliminate:'同色消除',chain_eliminate:'连锁消除',boom:'Boom · 爆破',stop_trigger:'Stop · 停滞生效',back:'Back · 彩球回退',stop_skip:'Stop · 本回合停滞中',feed:'等待球入轨',ammo_update:'弹药更新',turn_end:'回合结束',won:'胜利',lost:'本局结束'};
   const elements = () => new Map([...document.querySelectorAll('#track [data-ball-id], #feed [data-ball-id]')].map(element => [element.dataset.ballId, element]));
   const rect = element => {
     const box = element?.querySelector('.ball')?.getBoundingClientRect();
     if (!box || box.right <= 0 || box.left >= innerWidth || box.bottom <= 0 || box.top >= innerHeight) return null;
-    const region = element.closest('.track-scroll, .feed')?.getBoundingClientRect();
+    const region = element.closest('#game-stage, .track-scroll, .feed')?.getBoundingClientRect();
     if (region && (box.right <= region.left || box.left >= region.right || box.bottom <= region.top || box.top >= region.bottom)) return null;
     return box;
   };
@@ -25,8 +25,9 @@ window.ZumaAnimation = (() => {
     const copy = element.cloneNode(true);
     copy.removeAttribute('id'); copy.removeAttribute('data-ball-id');
     copy.classList.add('animation-ghost'); copy.setAttribute('aria-hidden','true');
-    Object.assign(copy.style, {left:`${box.left}px`,top:`${box.top}px`,width:`${box.width}px`,height:`${box.height}px`});
-    document.body.append(copy); return copy;
+    const parent=document.getElementById('stage-effects'),scene=document.getElementById('stage-scene').getBoundingClientRect(),scale=window.ZumaStage.scale;
+    Object.assign(copy.style, {left:`${(box.left-scene.left)/scale}px`,top:`${(box.top-scene.top)/scale}px`,width:`${box.width/scale}px`,minWidth:`${box.width/scale}px`,height:`${box.height/scale}px`});
+    parent.append(copy); return copy;
   }
   async function sprite(kind, box, duration = 320) {
     if (!box || skip || reduced() || document.hidden) return;
@@ -35,10 +36,9 @@ window.ZumaAnimation = (() => {
     const element = document.createElement('span'); element.className = `sprite-effect sprite-${kind}`;
     element.setAttribute('aria-hidden','true');
     const size = Math.min(kind === 'boom' ? 132 : 90, box.width * (kind === 'boom' ? 2.4 : 1.8));
-    Object.assign(element.style,{left:`${box.left+box.width/2-size/2}px`,top:`${box.top+box.height/2-size/2}px`,width:`${size}px`,height:`${size}px`,backgroundImage:`url('${sources[kind]}')`,backgroundSize:`${counts[kind]*100}% 100%`});
-    document.body.append(element);
-    const arena = document.querySelector('.board-panel').getBoundingClientRect();
-    element.style.clipPath = `inset(${Math.max(0,arena.top-parseFloat(element.style.top))}px ${Math.max(0,parseFloat(element.style.left)+size-arena.right)}px ${Math.max(0,parseFloat(element.style.top)+size-arena.bottom)}px ${Math.max(0,arena.left-parseFloat(element.style.left))}px)`;
+    const scene=document.getElementById('stage-scene').getBoundingClientRect(),scale=window.ZumaStage.scale;
+    Object.assign(element.style,{left:`${(box.left+box.width/2-size/2-scene.left)/scale}px`,top:`${(box.top+box.height/2-size/2-scene.top)/scale}px`,width:`${size/scale}px`,height:`${size/scale}px`,backgroundImage:`url('${sources[kind]}')`,backgroundSize:`${counts[kind]*100}% 100%`});
+    document.getElementById('stage-effects').append(element);
     try {
       if (element.animate) {
         const effect = element.animate([{backgroundPosition:'0% 0%'},{backgroundPosition:'100% 0%'}],{duration,easing:`steps(${counts[kind]-1})`,fill:'forwards'});
@@ -61,8 +61,13 @@ window.ZumaAnimation = (() => {
     for (const [id,element] of after) {
       const target = rect(element), previous = positions.get(id);
       if (!target) continue;
-      if (previous && Math.abs(previous.width-target.width) < 1 && !originals.has(id)) {
-        jobs.push(animate(element,[{transform:`translate(${previous.left-target.left}px,${previous.top-target.top}px)`},{transform:'translate(0,0)'}],220));
+      if (previous && Math.abs(previous.width-target.width) < 1 && !originals.has(id) && !event.ballIds.includes(id)) {
+        const oldIndex=before.get(id)?.dataset.trackIndex,newIndex=element.dataset.trackIndex;
+        if(oldIndex!==undefined&&newIndex!==undefined)jobs.push(animate(element,window.ZumaStage.pathFrames(Number(oldIndex),Number(newIndex)),260));
+        else {
+          const scale=newIndex!==undefined?window.ZumaStage.scale:1;
+          jobs.push(animate(element,[{transform:`translate(${(previous.left-target.left)/scale}px,${(previous.top-target.top)/scale}px)`},{transform:'translate(0,0)'}],220));
+        }
       }
     }
     for (const id of event.ballIds) {
@@ -75,7 +80,11 @@ window.ZumaAnimation = (() => {
       if (!copy && source) copy = ghost(destination,source);
       if (copy && source) {
         destination.style.visibility='hidden';
-        jobs.push(animate(copy,[{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${target.left-source.left}px,${target.top-source.top}px) scale(${target.width/source.width})`,opacity:1}],event.type==='back'?380:280).finally(()=>{destination.style.visibility='';copy.remove();}));
+        const scale=window.ZumaStage.scale;
+        const frames=[{transform:'translate(0,0) scale(1)',opacity:1}];
+        if(event.type==='insert'&&event.aim){const impact=window.ZumaStage.boxAt(event.aim.impact);frames.push({transform:`translate(${(impact.left-source.left)/scale}px,${(impact.top-source.top)/scale}px)`,opacity:1,offset:.75});}
+        frames.push({transform:`translate(${(target.left-source.left)/scale}px,${(target.top-source.top)/scale}px) scale(${target.width/source.width})`,opacity:1});
+        jobs.push(animate(copy,frames,event.type==='back'?380:350).finally(()=>{destination.style.visibility='';copy.remove();}));
       } else jobs.push(animate(destination,[{transform:'scale(.2)',opacity:0},{transform:'scale(1)',opacity:1}],240));
     }
     try { await Promise.all(jobs); } finally { for(const copy of originals.values())copy.remove(); }
@@ -95,6 +104,12 @@ window.ZumaAnimation = (() => {
       await sprite('ring',rect(map.get(event.ballIds[0])),320); render(event.snapshot);
     } else if (event.type === 'stop_skip') {
       await animate(document.querySelector('.board-panel'),[{boxShadow:'0 0 0 0 #e4bd7b00'},{boxShadow:'0 0 0 3px #e4bd7b99'},{boxShadow:'0 0 0 0 #e4bd7b00'}],300);render(event.snapshot);
+    } else if (event.type === 'spit') {
+      const source=document.querySelector('#current-ball .ball'),box=source?.getBoundingClientRect(),copy=ghost(source,box);
+      try {
+        if(copy&&box){const target=window.ZumaStage.boxAt(event.aim.destination),scale=window.ZumaStage.scale;source.style.visibility='hidden';await animate(copy,[{transform:'translate(0,0)',opacity:1},{transform:`translate(${(target.left-box.left)/scale}px,${(target.top-box.top)/scale}px)`,opacity:1,offset:.94},{transform:`translate(${(target.left-box.left)/scale}px,${(target.top-box.top)/scale}px)`,opacity:0}],350);}
+      }finally{if(source)source.style.visibility='';copy?.remove();}
+      render(event.snapshot);
     } else if (event.type === 'discard') {
       await animate(document.querySelector('#current-ball .ball'),[{transform:'translateY(0)',opacity:1},{transform:'translateY(28px) scale(.4)',opacity:0}],220);render(event.snapshot);
     } else if (event.type === 'ammo_update') {
@@ -107,8 +122,10 @@ window.ZumaAnimation = (() => {
     document.body.dataset.animating='true';
     document.getElementById('skip-animation').hidden=reduced() || !events.length;
     try {
-      for (const event of events) {
+      for (const sourceEvent of events) {
         if (skip || reduced() || document.hidden) break;
+        // Keep event lookups consistent with the string-valued DOM dataset keys.
+        const event = {...sourceEvent, ballIds: sourceEvent.ballIds.map(String)};
         document.getElementById('animation-status').textContent=names[event.type] || '更新状态';
         await phase(event,render);
       }

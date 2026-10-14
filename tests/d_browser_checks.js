@@ -58,7 +58,21 @@ async (page) => {
   await page.setViewportSize({width:390,height:844});
   const widths=await page.evaluate(()=>({page:document.documentElement.scrollWidth,viewport:innerWidth}));
   if(widths.page!==widths.viewport)throw Error('mobile page overflow');checks.push('second level and mobile');
-  await page.locator('#restart').click();await page.getByRole('heading',{name:'选择你的玩法'}).waitFor();
-  checks.push('restart returns to mode');
+  await page.locator('#finish-game').click();await idle();
+  const ended=(await api('/api/game')).state;
+  if(ended.status!=='ended')throw Error('manual end did not finish the game');
+  if(!(await page.locator('#result').isVisible()))throw Error('manual end result screen missing');
+  const saved=(await api('/api/history')).turns;
+  if(saved.length!==1||saved[0].turn!==1||JSON.stringify(saved[0].state.track)!==JSON.stringify(ended.track)||!saved[0].events?.length)throw Error('completed turn snapshot or event trace missing from replay history');
+  if(await page.locator('#turn-replay').isVisible())throw Error('recap should wait for the player to request it');
+  await page.locator('#result-recap').click();
+  const replayText=await page.locator('#replay-flow').innerText();
+  if(!(await page.locator('#turn-replay').isVisible())||!replayText.includes('第 1 回合')||!replayText.includes('TRACK ·')||!replayText.includes('FEED ·')||!replayText.includes('发射球')||!replayText.includes('丢弃当前球'))throw Error('static actual-state and event recap missing');
+  await page.locator('#close-replay').click();
+  if(await page.locator('#turn-replay').isVisible())throw Error('recap close action did not hide the timeline');
+  checks.push('manual end and static all-round recap');
+  await page.locator('#result-restart').click();await page.getByRole('heading',{name:'选择你的玩法'}).waitFor();
+  if((await api('/api/history')).turns.length)throw Error('old recap survived restart');
+  checks.push('restart returns to mode and clears prior recap');
   return {base,checks,seeds};
 }
