@@ -16,9 +16,10 @@ struct Level {
 };
 Level readLevel(std::istream& input);
 Level loadLevel(const std::string& path);
+std::vector<int> discoverLevels(const std::string& directory);
 std::string trim(const std::string& value);
 bool parsePositive(const std::string& value, std::size_t& result);
-enum class Status { Playing, Won, Lost };
+enum class Status { Playing, Won, Lost, Ended };
 enum class Special { None, Back, Stop, Boom };
 struct Ball {
     char color;
@@ -49,6 +50,7 @@ public:
     explicit Game(const Level& level, SpecialOptions options = {});
     bool shoot(std::size_t position);
     bool discard();
+    bool end();
     std::string track() const;
     std::string feed() const;
     std::vector<Ball> trackBalls() const { return {track_.begin(), track_.end()}; }

@@ -1,6 +1,9 @@
 #include "zuma.hpp"
 #include <charconv>
 #include <fstream>
+#include <filesystem>
+#include <algorithm>
+#include <limits>
 #include <map>
 #include <stdexcept>
 
@@ -57,5 +60,22 @@ Level loadLevel(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) throw std::runtime_error("无法打开关卡文件: " + path);
     return readLevel(file);
+}
+std::vector<int> discoverLevels(const std::string& directory) {
+    std::vector<int> result;
+    std::error_code error;
+    std::filesystem::directory_iterator files(directory,error);
+    if(error) throw std::runtime_error("无法读取关卡目录: "+directory);
+    for(const auto& file:files) {
+        if(!file.is_regular_file())continue;
+        const auto name=file.path().filename().string();
+        if(name.size()<10||name.compare(0,5,"level")!=0||name.substr(name.size()-4)!=".txt")continue;
+        const auto digits=name.substr(5,name.size()-9);
+        std::size_t id=0;
+        if(!parsePositive(digits,id)||id>static_cast<std::size_t>(std::numeric_limits<int>::max())||digits!=std::to_string(id))continue;
+        result.push_back(static_cast<int>(id));
+    }
+    std::sort(result.begin(),result.end());
+    return result;
 }
 }

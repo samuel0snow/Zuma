@@ -30,7 +30,8 @@ int main(int argc, char** argv) {
     }
     std::ifstream index(web + "/index.html");
     if (!index.is_open()) { std::cerr << "找不到网页资源: " << web << "/index.html\n"; return 1; }
-    zuma::GameApi api([levels](int id) { return zuma::loadLevel(levels + "/level" + std::to_string(id) + ".txt"); }, testing);
+    zuma::GameApi api([levels](int id) { return zuma::loadLevel(levels + "/level" + std::to_string(id) + ".txt"); },
+                      testing,[levels]{return zuma::discoverLevels(levels);});
     httplib::Server server;
     server.set_payload_max_length(8192);
     server.set_read_timeout(5, 0); server.set_write_timeout(5, 0);
@@ -81,15 +82,17 @@ int main(int argc, char** argv) {
         response.set_content(result.body.dump(), "application/json; charset=utf-8");
     };
     server.Get("/api/levels", route); server.Get("/api/game", route);
+    server.Get("/api/maps", route);
+    server.Get("/api/history", route);
     server.Post("/api/game", route); server.Post("/api/action", route); server.Post("/api/reset", route);
     // Serve only known assets; arbitrary paths never become filesystem paths.
-    for (const auto& asset : {"index.html", "style.css", "app.js", "animation.js"}) {
+    for (const auto& asset : {"index.html", "style.css", "app.js", "animation.js", "stage.js"}) {
         const std::string filename = asset;
         auto serve = [web, filename](const httplib::Request&, httplib::Response& response) {
             std::ifstream file(web + "/" + filename, std::ios::binary);
             if (!file.is_open()) { response.status = 404; return; }
             std::ostringstream bytes; bytes << file.rdbuf();
-            const auto mime = filename == "style.css" ? "text/css" : filename == "app.js" || filename == "animation.js" ? "application/javascript" : "text/html";
+            const auto mime = filename == "style.css" ? "text/css" : filename.size()>3 && filename.substr(filename.size()-3)==".js" ? "application/javascript" : "text/html";
             response.set_content(bytes.str(), std::string(mime) + "; charset=utf-8");
         };
         auto routePath = "/" + filename;

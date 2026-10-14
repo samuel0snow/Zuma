@@ -38,6 +38,11 @@ def main():
         levels = pathlib.Path(folder)
         (levels / "level1.txt").write_text("ACTIVE=RR\nFEED=\nAMMO=R\nMAX_LENGTH=2\n")
         (levels / "level2.txt").write_text("ACTIVE=R\nFEED=G\nAMMO=B\nMAX_LENGTH=1\n")
+        third_text=(executable.parent / "levels/level3.txt").read_text(encoding="utf-8")
+        (levels / "level3.txt").write_text(third_text,encoding="utf-8")
+        (levels / "level7.txt").write_text("ACTIVE=RR\nFEED=\nAMMO=R\nMAX_LENGTH=2\n")
+        for name in ["level03.txt","level0.txt","levelname.txt"]:
+            (levels / name).write_text("ignored")
         # Launch outside the checkout and use the packaged web assets beside
         # the executable, rather than relying on the working directory.
         process = subprocess.Popen([str(executable), "--port", str(port), "--levels", str(levels), "--test-mode"], cwd=folder, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
@@ -53,7 +58,7 @@ def main():
                     time.sleep(0.05)
             else:
                 raise RuntimeError("server did not become ready")
-            for asset in ["/", "/style.css", "/app.js", "/animation.js"]:
+            for asset in ["/", "/style.css", "/app.js", "/animation.js", "/stage.js", "/api/maps"]:
                 code, content, hdr = request(asset)
                 assert code == 200 and content and hdr["X-Content-Type-Options"] == "nosniff"
             for asset, mime in [("/assets/balls/vector/blue.svg", "image/svg+xml"),
@@ -74,6 +79,9 @@ def main():
             assert request("/api/game", raw=b"[" * 100 + b"0" + b"]" * 100)[0] == 400
             assert request("/api/game", raw=b"x" * 9000)[0] == 413
             ready = json.loads(data)["state"]
+            catalog=json.loads(request("/api/levels")[1])["levels"]
+            assert [item["id"] for item in catalog]==[1,2,3,7]
+            assert catalog[2]["active"]=="RRBBGGRRYYPPBBGG" and catalog[2]["maxLength"]==30
             code, created, create_body = post("/api/game", ready, "create", levelId=1, specialsEnabled=False, seed=42)
             assert code == 200
             assert json.loads(request("/api/game", create_body)[1]) == created
@@ -83,10 +91,17 @@ def main():
             assert json.loads(request("/api/game")[1])["state"] == state
             code, won, shot = post("/api/action", state, "shot", type="shoot", position=2)
             assert code == 200 and won["state"]["status"] == "won" and won["state"]["score"] == 30
+            turns = json.loads(request("/api/history")[1])["turns"]
+            assert len(turns) == 1 and turns[0]["state"]["status"] == "won"
+            assert turns[0]["messages"] == won["messages"]
+            assert turns[0]["events"] == won["events"]
+            assert turns[0]["state"]["track"] == won["state"]["track"]
+            assert turns[0]["state"]["feed"] == won["state"]["feed"]
             assert json.loads(request("/api/action", shot)[1]) == won
             assert post("/api/action", won["state"], "after-win", type="discard")[0] == 409
             code, reset, _ = post("/api/reset", won["state"], "reset")
             assert code == 200 and reset["state"]["status"] == "ready"
+            assert json.loads(request("/api/history")[1])["turns"] == []
             assert post("/api/action", state, "old", type="discard")[0] == 409
             code, second, _ = post("/api/game", reset["state"], "second", levelId=2, specialsEnabled=True, seed=7)
             assert code == 200 and second["state"]["specialChancePercent"] == 30
@@ -97,8 +112,28 @@ def main():
             payloads = [json.loads(reply[1]) for reply in replies]
             assert all(payload == payloads[0] for payload in payloads)
             assert payloads[0]["state"]["turns"] == 1 and payloads[0]["state"]["status"] == "lost"
+            lost_history = json.loads(request("/api/history")[1])["turns"]
+            assert len(lost_history) == 1 and lost_history[0]["state"]["status"] == "lost"
+            assert post("/api/action", payloads[0]["state"], "after-loss", type="end")[0] == 409
+            code,current,_=post("/api/reset",payloads[0]["state"],"after-loss-reset")
+            assert code==200
+            for map_id in ["straight","s","spiral"]:
+                for special in [False,True]:
+                    code,third,_=post("/api/game",current["state"],f"third-{map_id}-{special}",levelId=3,mapId=map_id,specialsEnabled=special,seed=42)
+                    assert code==200 and third["state"]["levelId"]==3
+                    assert len(third["state"]["track"])==16 and len(third["state"]["feed"])==24 and third["state"]["maxLength"]==30
+                    code,turn,_=post("/api/action",third["state"],f"third-discard-{map_id}-{special}",type="discard")
+                    assert code==200 and turn["state"]["turns"]==1 and len(turn["state"]["track"])==17 and len(turn["state"]["feed"])==23
+                    code,current,_=post("/api/reset",turn["state"],f"third-reset-{map_id}-{special}")
+                    assert code==200
+            assert post("/api/game",current["state"],"missing-four",levelId=4,specialsEnabled=False)[0]==404
+            # New files appear without a restart or a code change, including sparse IDs.
+            (levels / "level9.txt").write_text("ACTIVE=RR\nFEED=\nAMMO=R\nMAX_LENGTH=2\n")
+            assert [item["id"] for item in json.loads(request("/api/levels")[1])["levels"]]==[1,2,3,7,9]
+            code,added,_=post("/api/game",current["state"],"new-nine",levelId=9,specialsEnabled=False)
+            assert code==200 and added["state"]["levelId"]==9
             assert request("/api/game", headers={"Host": "evil.example"})[0] == 403
-            print("HTTP assets, validation, origin, duplicate/concurrent requests, victory/loss/reset passed.")
+            print("HTTP assets, validation, origin, duplicate/concurrent requests, victory/loss/reset, dynamic level discovery and third level across maps passed.")
         finally:
             process.terminate()
             try:

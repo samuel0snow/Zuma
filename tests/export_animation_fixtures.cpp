@@ -24,6 +24,8 @@ int main(int argc, char** argv) {
     };
     using zuma::Special;
     add("chain",{"RRBBRR","G",{'B','G'},12},{},4);
+    add("stop-back-summary",{"RRBBRR","G",{'B','G'},12},
+        {0,0,{Special::Stop,Special::Back,Special::Back,Special::None,Special::Stop,Special::None}},4);
     add("back",{"GBYRR","P",{'R'},12},{0,0,{Special::None,Special::None,Special::None,Special::Back}},6);
     add("boom",{"GBYRRPG","",{'R'},12},{0,0,{Special::None,Special::None,Special::None,Special::Boom}},5);
     add("stop",{"RR","GBYP",{'R'},12},{0,0,{Special::Stop}},2);

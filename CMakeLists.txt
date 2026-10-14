@@ -20,6 +20,7 @@ if(MINGW)
     add_compile_definitions(__MSVCRT_VERSION__=0x600)
   endif()
 endif()
+file(GLOB ZUMA_LEVEL_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/levels/level*.txt")
 add_library(zuma_core src/game.cpp src/level.cpp)
 target_include_directories(zuma_core PUBLIC include)
 if(MSVC)
@@ -35,7 +36,7 @@ endif()
 add_custom_command(TARGET zuma POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:zuma>/levels"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_SOURCE_DIR}/levels/level1.txt" "${CMAKE_SOURCE_DIR}/levels/level2.txt"
+    ${ZUMA_LEVEL_FILES}
     "$<TARGET_FILE_DIR:zuma>/levels"
   VERBATIM)
 enable_testing()
@@ -47,7 +48,7 @@ endif()
 add_test(NAME zuma_rules COMMAND zuma_tests)
 
 find_package(Threads REQUIRED)
-add_library(zuma_api src/server/api.cpp)
+add_library(zuma_api src/server/api.cpp src/maps.cpp)
 target_include_directories(zuma_api SYSTEM PUBLIC third_party/json)
 target_link_libraries(zuma_api PUBLIC zuma_core Threads::Threads)
 add_executable(zuma_gui src/server/main.cpp)
@@ -62,7 +63,7 @@ endif()
 set(ZUMA_GUI_ASSET_COMMANDS
   COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:zuma_gui>/levels"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_SOURCE_DIR}/levels/level1.txt" "${CMAKE_SOURCE_DIR}/levels/level2.txt"
+    ${ZUMA_LEVEL_FILES}
     "$<TARGET_FILE_DIR:zuma_gui>/levels"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/web" "$<TARGET_FILE_DIR:zuma_gui>/web"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/third_party" "$<TARGET_FILE_DIR:zuma_gui>/third_party")
@@ -74,6 +75,12 @@ if(MINGW)
   target_link_options(zuma_api_tests PRIVATE -static -static-libgcc -static-libstdc++)
 endif()
 add_test(NAME zuma_api_rules COMMAND zuma_api_tests)
+add_executable(zuma_map_tests tests/map_tests.cpp)
+target_link_libraries(zuma_map_tests PRIVATE zuma_api)
+if(MINGW)
+  target_link_options(zuma_map_tests PRIVATE -static -static-libgcc -static-libstdc++)
+endif()
+add_test(NAME zuma_maps COMMAND zuma_map_tests)
 add_executable(zuma_animation_fixtures tests/export_animation_fixtures.cpp)
 target_link_libraries(zuma_animation_fixtures PRIVATE zuma_api)
 if(MINGW)

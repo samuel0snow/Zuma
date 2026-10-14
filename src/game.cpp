@@ -85,6 +85,13 @@ bool Game::discard() {
     finishTurn();
     return true;
 }
+bool Game::end() {
+    if (status_ != Status::Playing) return false;
+    status_ = Status::Ended;
+    events_.clear(); turnEvents_.clear();
+    events_.push_back("本局已主动结束");
+    return true;
+}
 void Game::eliminate(std::list<Ball>::iterator ball) {
     bool chained = false;
     while (true) {

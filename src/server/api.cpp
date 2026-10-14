@@ -1,5 +1,7 @@
 #include "zuma_api.hpp"
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <limits>
 #include <set>
 #include <stdexcept>
@@ -13,7 +15,7 @@ struct ApiError : std::runtime_error {
         : std::runtime_error(message), status(status), code(std::move(code)) {}
 };
 const char* statusName(Status status) {
-    return status == Status::Won ? "won" : status == Status::Lost ? "lost" : "playing";
+    return status == Status::Won ? "won" : status == Status::Lost ? "lost" : status == Status::Ended ? "ended" : "playing";
 }
 Json ballsJson(const std::vector<Ball>& balls) {
     Json result = Json::array();
@@ -49,6 +51,26 @@ void resourceCheck(const Level& level) {
     if (level.active.size() > 4096 || level.feed.size() > 4096 || level.ammo.size() > 4096 || level.maxLength > 4096)
         throw ApiError(422, "LEVEL_TOO_LARGE", "GUI 关卡每个字段最多支持 4096 个球或容量");
 }
+Json pointJson(Point p) { return {{"x",p.x},{"y",p.y}}; }
+Json mapJson(const MapGeometry& map) {
+    Json points=Json::array();
+    for(auto p:map.path) points.push_back({p.x,p.y});
+    return {{"id",map.id},{"title",map.title},{"width",map.width},{"height",map.height},
+            {"diameter",map.diameter},{"pitch",map.pitch},{"safetyMargin",map.safetyMargin},
+            {"launcher",pointJson(map.launcher)},{"path",points},{"distances",map.distances}};
+}
+Point directionField(const Json& body) {
+    fields(body,{"x","y"});
+    Point p;
+    for(const char* key:{"x","y"}) {
+        if(!body.contains(key)||!body[key].is_number()) throw ApiError(400,"INVALID_AIM","瞄准方向必须是数值");
+        const double value=body[key].get<double>();
+        if(!std::isfinite(value)||std::abs(value)>1e6) throw ApiError(400,"INVALID_AIM","瞄准方向超出范围");
+        if(std::string(key)=="x") p.x=value; else p.y=value;
+    }
+    if(std::hypot(p.x,p.y)<1e-8) throw ApiError(400,"INVALID_AIM","瞄准方向不能为零");
+    return p;
+}
 }
 Json snapshotJson(const GameSnapshot& snapshot) {
     return {{"track", ballsJson(snapshot.track)}, {"feed", ballsJson(snapshot.feed)},
@@ -66,7 +88,7 @@ Json turnEventsJson(const Game& game) {
     }
     return result;
 }
-GameApi::GameApi(Loader loader, bool allowTestSeed) : loader_(std::move(loader)), allowTestSeed_(allowTestSeed) {
+GameApi::GameApi(Loader loader, bool allowTestSeed, Catalog catalog) : loader_(std::move(loader)), catalog_(std::move(catalog)), allowTestSeed_(allowTestSeed) {
     instance_ = std::to_string(std::chrono::high_resolution_clock::now().time_since_epoch().count()) + "-" + std::to_string(std::random_device{}());
     sessionId_ = newSession();
 }
@@ -80,6 +102,8 @@ Json GameApi::state() const {
     result["specialChancePercent"] = specialsEnabled_ ? 30 : 0;
     result["seed"] = seed_;
     result["maxLength"] = game_ ? game_->maxLength() : 0;
+    result["mapId"] = mapId_;
+    if(game_) result["map"] = mapJson(makeMap(mapId_,game_->maxLength()));
     result["lastRequestId"] = lastRequestId_;
     return result;
 }
@@ -87,9 +111,12 @@ ApiResponse GameApi::handle(const std::string& method, const std::string& path, 
     std::lock_guard<std::mutex> lock(mutex_);
     try {
         if (method == "GET" && path == "/api/game") return {200, {{"state", state()}}};
+        if (method == "GET" && path == "/api/history") return {200, {{"turns", history_}}};
+        if (method == "GET" && path == "/api/maps") return {200, {{"maps", Json::array({
+            {{"id","straight"},{"title","直线地图"}},{{"id","spiral"},{"title","螺旋类环形地图"}},{{"id","s"},{"title","S 形地图"}}})}}};
         if (method == "GET" && path == "/api/levels") {
             Json levels = Json::array();
-            for (int id : {1, 2}) {
+            for (int id : catalog_()) {
                 Json item{{"id", id}, {"title", "关卡 " + std::to_string(id)}};
                 try {
                     auto level = loader_(id); resourceCheck(level);
@@ -103,8 +130,8 @@ ApiResponse GameApi::handle(const std::string& method, const std::string& path, 
         }
         if (method != "POST" || (path != "/api/game" && path != "/api/action" && path != "/api/reset"))
             throw ApiError(404, "NOT_FOUND", "接口不存在");
-        if (path == "/api/game") fields(body, {"sessionId", "version", "requestId", "levelId", "specialsEnabled", "seed"});
-        else if (path == "/api/action") fields(body, {"sessionId", "version", "requestId", "type", "position"});
+        if (path == "/api/game") fields(body, {"sessionId", "version", "requestId", "levelId", "specialsEnabled", "seed", "mapId"});
+        else if (path == "/api/action") fields(body, {"sessionId", "version", "requestId", "type", "position", "direction"});
         else fields(body, {"sessionId", "version", "requestId"});
         const auto requestId = stringField(body, "requestId");
         const auto cached = cache_.find(requestId);
@@ -118,8 +145,10 @@ ApiResponse GameApi::handle(const std::string& method, const std::string& path, 
         Json events = Json::array(), messages = Json::array();
         if (path == "/api/game") {
             if (game_) throw ApiError(409, "GAME_EXISTS", "请先重启再创建新游戏");
-            const auto id = integerField(body, "levelId", 2);
-            if (id == 0) throw ApiError(404, "LEVEL_NOT_FOUND", "关卡不存在");
+            const auto id = integerField(body, "levelId", std::numeric_limits<int>::max());
+            const auto ids=catalog_();
+            if (id == 0||std::find(ids.begin(),ids.end(),static_cast<int>(id))==ids.end())
+                throw ApiError(404, "LEVEL_NOT_FOUND", "关卡不存在");
             if (!body.contains("specialsEnabled") || !body["specialsEnabled"].is_boolean())
                 throw ApiError(400, "INVALID_FIELD", "specialsEnabled 必须是布尔值");
             unsigned seed = std::random_device{}();
@@ -128,35 +157,80 @@ ApiResponse GameApi::handle(const std::string& method, const std::string& path, 
                 seed = static_cast<unsigned>(integerField(body, "seed", std::numeric_limits<unsigned>::max()));
             }
             const bool specials = body["specialsEnabled"].get<bool>();
+            const auto mapId=body.contains("mapId")?stringField(body,"mapId",16):"straight";
+            if(mapId!="straight"&&mapId!="spiral"&&mapId!="s") throw ApiError(400,"INVALID_MAP","地图不存在");
             Level level;
             try { level = loader_(static_cast<int>(id)); }
             catch (const std::exception& error) { throw ApiError(422, "LEVEL_LOAD_FAILED", error.what()); }
             resourceCheck(level);
-            auto next = std::make_unique<Game>(level, SpecialOptions{specials ? 30U : 0U, seed, {}});
+            // Construct fully before changing the previous terminal session.
+            // A failed create must not erase its recap or partial game state.
+            std::unique_ptr<Game> next;
+            try { next = std::make_unique<Game>(level, SpecialOptions{specials ? 30U : 0U, seed, {}}); }
+            catch (const std::exception& error) { throw ApiError(422, "GAME_CREATE_FAILED", error.what()); }
             game_ = std::move(next); levelId_ = static_cast<int>(id); seed_ = seed; specialsEnabled_ = specials;
+            mapId_=mapId;
+            history_.clear();
             sessionId_ = newSession();
         } else if (path == "/api/reset") {
-            game_.reset(); levelId_ = 0; seed_ = 0; specialsEnabled_ = false; sessionId_ = newSession();
+            game_.reset(); history_.clear();
+            levelId_ = 0; seed_ = 0; specialsEnabled_ = false; sessionId_ = newSession();
+            mapId_="straight";
         } else {
             if (!game_) throw ApiError(409, "NO_GAME", "请先选择关卡");
             if (game_->status() != Status::Playing) throw ApiError(409, "GAME_FINISHED", "游戏已结束，请重启");
             const auto type = stringField(body, "type", 16);
             bool valid = false;
+            std::size_t position = 0;
+            const auto scoreBefore = game_->score();
+            const auto trackBefore = game_->trackBalls().size();
+            const auto feedBefore = game_->feedBalls().size();
+            Json aim=nullptr;
+            std::string actionName=type;
             if (type == "shoot") {
-                const auto position = integerField(body, "position", 4097);
-                if (position < 1 || position > game_->trackBalls().size() + 1)
-                    throw ApiError(400, "INVALID_POSITION", "发射位置越界");
-                valid = game_->shoot(static_cast<std::size_t>(position));
+                if(body.contains("direction")) {
+                    if(body.contains("position")) throw ApiError(400,"INVALID_FIELD","瞄准发射不接受 position");
+                    const auto result=resolveAim(makeMap(mapId_,game_->maxLength()),trackBefore,directionField(body["direction"]));
+                    position=result.position;
+                    aim={{"kind",result.kind},{"direction",pointJson(result.direction)},{"impact",pointJson(result.impact)},
+                         {"destination",pointJson(result.destination)},{"position",position},
+                         {"targetId",result.kind=="spit"?Json(nullptr):Json(std::to_string(game_->trackBalls()[result.targetIndex].id))}};
+                    if(result.kind=="spit") {valid=game_->discard();actionName="spit";}
+                    else valid=game_->shoot(position);
+                } else {
+                    // Retain numbered actions for CLI-equivalence fixtures and older clients.
+                    position = integerField(body, "position", 4097);
+                    if (position < 1 || position > game_->trackBalls().size() + 1)
+                        throw ApiError(400, "INVALID_POSITION", "发射位置越界");
+                    valid = game_->shoot(position);
+                }
             } else if (type == "discard") {
-                if (body.contains("position")) throw ApiError(400, "INVALID_FIELD", "丢弃操作不接受 position");
+                if (body.contains("position")||body.contains("direction")) throw ApiError(400, "INVALID_FIELD", "丢弃操作不接受发射参数");
                 valid = game_->discard();
-            } else throw ApiError(400, "INVALID_ACTION", "仅支持 shoot 或 discard");
+            } else if (type == "end") {
+                if (body.contains("position")||body.contains("direction")) throw ApiError(400, "INVALID_FIELD", "结束操作不接受发射参数");
+                valid = game_->end();
+            } else throw ApiError(400, "INVALID_ACTION", "仅支持 shoot、discard 或 end");
             if (!valid) throw ApiError(400, "INVALID_ACTION", "操作无效");
             events = turnEventsJson(*game_);
+            if(!aim.is_null()&&!events.empty()) {
+                events[0]["aim"]=aim;
+                if(actionName=="spit") events[0]["type"]="spit";
+            }
             messages = game_->events();
+            if (type != "end") {
+                history_.push_back({{"turn", game_->turns()}, {"action", actionName},{"mapId",mapId_},{"aim",aim},
+                                    {"position", actionName == "shoot" ? Json(position) : Json(nullptr)},
+                                    {"score", game_->score()}, {"scoreDelta", game_->score() - scoreBefore},
+                                    {"trackLengthBefore", trackBefore}, {"feedCountBefore", feedBefore},
+                                    {"trackLength", game_->trackBalls().size()}, {"feedCount", game_->feedBalls().size()},
+                                    {"status", statusName(game_->status())}, {"state", snapshotJson(game_->snapshot())},
+                                    {"events", events}, {"messages", messages}});
+            }
         }
         ++version_; lastRequestId_ = requestId;
         ApiResponse response{200, {{"state", state()}, {"events", events}, {"messages", messages}}};
+        if (path == "/api/action" && body["type"] != "end") response.body["historyEntry"] = history_.back();
         cache_[requestId] = {body, path, response}; cacheOrder_.push_back(requestId);
         if (cacheOrder_.size() > 64) { cache_.erase(cacheOrder_.front()); cacheOrder_.pop_front(); }
         return response;

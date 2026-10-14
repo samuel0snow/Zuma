@@ -80,6 +80,10 @@ int main() {
         require(full.shoot(3) && full.status() == zuma::Status::Won, "full track can shoot");
         zuma::Game empty(level("", "", "P"));
         require(empty.status() == zuma::Status::Won && empty.turns() == 0 && empty.nextBall() == 'P', "initial victory and single ammo");
+        zuma::Game manuallyEnded(level("RGB", "G", "P"));
+        require(manuallyEnded.end() && manuallyEnded.status() == zuma::Status::Ended && manuallyEnded.turns() == 0,
+                "manual end terminates game without adding a turn");
+        require(!manuallyEnded.discard() && !manuallyEnded.end(), "ended game rejects further actions");
         zuma::Game endpoints(level("G", "P", "BR"));
         require(endpoints.shoot(1) && endpoints.track() == "PBG", "front insertion");
         require(endpoints.shoot(4) && endpoints.track() == "PBGR", "end insertion");

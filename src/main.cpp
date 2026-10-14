@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <chrono>
+#include <algorithm>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -146,10 +147,10 @@ int main(int argc, char** argv) {
         const auto separator = executable.find_last_of("/\\");
         const auto executableDir = separator == std::string::npos ? std::string(".") : executable.substr(0, separator);
         for (const auto& candidate : {executableDir + "/levels", std::string("levels")}) {
-            std::ifstream probe(candidate + "/level1.txt");
-            if (probe.is_open()) { directory = candidate; break; }
+            try {if(!zuma::discoverLevels(candidate).empty()){directory=candidate;break;}}
+            catch(const std::exception&) { /* Try the next configured resource location. */ }
         }
-        if (directory.empty()) directory = "Zuma";
+        if (directory.empty()) directory = "levels";
     }
     std::cout << "祖玛 CLI — R红 G绿 B蓝 Y黄 P紫\n";
     std::string command;
@@ -167,15 +168,22 @@ int main(int argc, char** argv) {
             chooseMode = false;
             if (specialsEnabled) displaySpecialHelp();
         }
-        std::cout << "\n关卡列表:\n1. level1.txt\n2. level2.txt\n输入关卡编号，输入 restart 返回属性选择，或 exit 退出: " << std::flush;
+        std::vector<int> levels;
+        try {levels=zuma::discoverLevels(directory);}
+        catch(const std::exception& error){std::cout<<error.what()<<'\n';return 1;}
+        std::cout << "\n关卡列表:\n";
+        for(int id:levels)std::cout<<id<<". level"<<id<<".txt\n";
+        if(levels.empty())std::cout<<"（没有可用关卡文件）\n";
+        std::cout<<"输入关卡编号，输入 restart 返回属性选择，或 exit 退出: "<<std::flush;
         if (!std::getline(std::cin, command)) break;
         command = zuma::trim(command);
         if (command.compare(0, 3, "\xEF\xBB\xBF") == 0) command = zuma::trim(command.substr(3));
         if (command == "exit") break;
         if (command == "restart") { chooseMode = true; specialsEnabled = false; clearScreen(); continue; }
         std::size_t selection = 0;
-        if (!zuma::parsePositive(command, selection) || selection > 2) {
-            std::cout << "无效关卡编号，请输入 1 或 2。\n"; continue;
+        if (!zuma::parsePositive(command, selection) ||
+            std::none_of(levels.begin(),levels.end(),[selection](int id){return static_cast<std::size_t>(id)==selection;})) {
+            std::cout << "无效关卡编号，请输入列表中的编号。\n"; continue;
         }
         try {
             zuma::SpecialOptions options;

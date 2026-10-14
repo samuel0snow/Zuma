@@ -35,14 +35,32 @@ int main() {
         auto shoot = mutation(state, "shoot"); shoot.update({{"type","shoot"},{"position",4}});
         auto shot = api.handle("POST", "/api/action", shoot);
         require(shot.status == 200 && shot.body["state"]["score"] == 70 && shot.body["state"]["turns"] == 1, "ordinary chain over API");
+        require(shot.body["historyEntry"]["turn"] == 1 && shot.body["historyEntry"]["action"] == "shoot", "turn recorded for replay");
+        auto history = api.handle("GET", "/api/history");
+        require(history.status == 200 && history.body["turns"].size() == 1, "all-round history listed");
+        const auto& replay = history.body["turns"][0];
+        require(replay["state"]["score"] == shot.body["state"]["score"] &&
+                replay["state"]["turns"] == shot.body["state"]["turns"] &&
+                replay["state"]["track"] == shot.body["state"]["track"] &&
+                replay["state"]["feed"] == shot.body["state"]["feed"], "round recap stores actual end-of-turn snapshot");
+        require(replay["events"] == shot.body["events"], "round recap stores structured core event trace");
+        require(replay["messages"] == shot.body["messages"], "round recap stores core event messages");
         require(api.handle("POST", "/api/action", shoot).body == shot.body, "idempotent shot");
         auto conflict = shoot; conflict["position"] = 3;
         require(api.handle("POST", "/api/action", conflict).status == 409, "conflicting request ID");
         auto stale = shoot; stale["requestId"] = "stale";
         require(api.handle("POST", "/api/action", stale).status == 409, "reject stale version");
-        auto reset = mutation(shot.body["state"], "reset");
+        auto end = mutation(shot.body["state"], "end"); end["type"] = "end";
+        auto ended = api.handle("POST", "/api/action", end);
+        require(ended.status == 200 && ended.body["state"]["status"] == "ended", "manual end action");
+        require(ended.body["state"]["turns"] == 1 && api.handle("GET", "/api/history").body["turns"].size() == 1,
+                "manual end preserves completed rounds without adding a turn");
+        auto afterEnd = mutation(ended.body["state"], "after-end"); afterEnd["type"] = "discard";
+        require(api.handle("POST", "/api/action", afterEnd).status == 409, "ended game locks turn actions");
+        auto reset = mutation(ended.body["state"], "reset");
         auto resetResult = api.handle("POST", "/api/reset", reset);
         require(resetResult.status == 200 && resetResult.body["state"]["status"] == "ready", "reset to mode");
+        require(api.handle("GET", "/api/history").body["turns"].empty(), "restart clears replay history");
         require(api.handle("POST", "/api/reset", reset).body == resetResult.body, "idempotent reset");
         auto old = mutation(shot.body["state"], "old-session"); old["type"] = "discard";
         require(api.handle("POST", "/api/action", old).status == 409, "old session cannot touch reset");
