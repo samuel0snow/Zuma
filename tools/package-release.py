@@ -21,9 +21,10 @@ def runtime_web(source, target):
     target.mkdir(parents=True, exist_ok=True)
     for name in ["index.html","style.css","app.js","animation.js"]:
         copy(source/name,target/name)
-    for name in ["backgrounds","launcher","balls/vector","icons/ui","track","licenses"]:
+    for name in ["backgrounds","launcher","balls/vector","balls/gemstone","icons/ui","track","licenses"]:
         copy(source/"assets"/name,target/"assets"/name)
     copy(source/"assets/CREDITS.md",target/"assets/CREDITS.md")
+    copy(source/"assets/favicon.svg",target/"assets/favicon.svg")
     for name in ["flash-seq","boom-seq","ring-seq"]:
         copy(source/"assets/effects"/name/"sheet.png",target/"assets/effects"/name/"sheet.png")
 
@@ -55,7 +56,7 @@ def main():
         for name in ["levels", "third_party"]:
             copy(args.build / name, runtime / name)
         runtime_web(args.build/"web",runtime/"web")
-        for name in ["README.md", "Zuma 实现方式.md", "Zuma 中期建设方案.md", "Zuma 美术资源需求.md", "docs"]:
+        for name in ["README.md", "docs"]:
             copy(ROOT / name, runtime / name)
         copy(ROOT / "docs/运行与交付说明.md", runtime / "运行说明.md")
         (runtime / "启动GUI.cmd").write_text('@echo off\r\ncd /d "%~dp0"\r\nzuma_gui.exe\r\npause\r\n', encoding="ascii")
@@ -70,7 +71,7 @@ def main():
         # It does not depend on the machine-specific art download folder.
         source = staging / "Zuma-source"
         source.mkdir(exist_ok=True)
-        for name in [".gitignore", "CMakeLists.txt", "README.md", "Zuma 实现方式.md", "Zuma 中期建设方案.md", "Zuma 美术资源需求.md", "Zuma", "include", "src", "web", "third_party", "tests", "tools", "docs"]:
+        for name in [".gitignore", "CMakeLists.txt", "README.md", "levels", "include", "src", "web", "third_party", "tests", "tools", "docs"]:
             copy(ROOT / name, source / name)
         archive(source, args.output / "Zuma-source.zip")
     print(args.output / "Zuma-windows-x64.zip")

@@ -2,7 +2,6 @@
 const $ = id => document.getElementById(id);
 let state = null, levels = [], specials = false, busy = false, connected = false;
 let view = 'mode', messages = [], turnEvents = [];
-const titles = {1: '回声之环', 2: '五色回廊'};
 function requestId() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`; }
 async function request(path, body) {
   const controller = new AbortController();
@@ -43,11 +42,10 @@ function ball(color, sizeClass = '') {
   const element = document.createElement('span');
   element.className = `ball color-${color} ${sizeClass}`;
   const colors = {R:'red',G:'green',B:'blue',Y:'yellow',P:'purple'};
-  const image = document.createElement('img'); image.src = `/assets/balls/vector/${colors[color]}.svg`;
+  const image = document.createElement('img'); image.src = `/assets/balls/gemstone/${colors[color]}.webp`;
   image.alt='';image.className='ball-art';image.draggable=false;
   image.addEventListener('error',()=>image.remove(),{once:true});
-  const letter=document.createElement('span');letter.className='ball-letter';letter.textContent=color;
-  element.append(image,letter);
+  element.append(image);
   element.setAttribute('aria-label', `${{R:'红',G:'绿',B:'蓝',Y:'黄',P:'紫'}[color]}球 ${color}`);
   return element;
 }
@@ -64,24 +62,23 @@ function ballColumn(item) {
 }
 function renderLevels() {
   const container = $('level-list'); container.replaceChildren();
-  $('selected-mode').textContent = specials ? '特殊属性模式 · 10% 属性概率' : '经典模式';
+  $('selected-mode').textContent = specials ? '特殊属性模式 · 各属性 10%（总概率 30%）' : '经典模式';
   for (const level of levels) {
     const card = document.createElement('article'); card.className = 'level-card';
     const number = document.createElement('div'); number.className = 'level-number'; number.textContent = String(level.id).padStart(2, '0');
-    const title = document.createElement('h2'); title.textContent = level.title;
-    const subtitle = document.createElement('p'); subtitle.className = 'muted'; subtitle.textContent = level.id === 1 ? '从一次蓝色连锁开始。' : '在交错的色彩中，寻找下一次相遇。';
+    const title = document.createElement('h2'); title.textContent = `关卡 ${level.id}`;
     const preview = document.createElement('div'); preview.className = 'level-preview';
     for (const color of level.active || '') preview.append(ball(color));
     const detail = document.createElement('div'); detail.className = 'level-detail';
     detail.textContent = level.available ? `轨道容量 ${level.maxLength}   /   等待彩球 ${level.feedCount}` : `关卡暂不可用：${level.error}`;
     const start = document.createElement('button'); start.className = 'primary wide'; start.dataset.level = level.id; start.textContent = `进入关卡 ${level.id} →`; start.addEventListener('click', () => startGame(level.id));
-    card.append(number, title, subtitle, preview, detail, start); container.append(card);
+    card.append(number, title, preview, detail, start); container.append(card);
   }
   lock();
 }
 function renderGame(game = state) {
-  $('game-heading').textContent = `关卡 ${game.levelId} · ${titles[game.levelId]}`;
-  $('game-mode').textContent = game.specialsEnabled ? '特殊属性模式 / 10% 属性概率' : '经典模式';
+  $('game-heading').textContent = `关卡 ${game.levelId}`;
+  $('game-mode').textContent = game.specialsEnabled ? '特殊属性模式 / 各属性 10%（总概率 30%）' : '经典模式';
   $('score').textContent = game.score; $('turns').textContent = game.turns;
   $('length').textContent = `${game.track.length} / ${game.maxLength}`;
   const finished = game.status !== 'playing';
@@ -89,8 +86,13 @@ function renderGame(game = state) {
   $('track-hint').textContent = finished ? '本局已结束，重新开始可以选择新的玩法与关卡。' : '点击编号，将当前球发射到对应间隙。';
   $('stop-remaining').hidden = !game.stoppedTurns; $('stop-remaining').textContent = `停滞剩余: ${game.stoppedTurns} 回合`;
   const track = $('track'); track.replaceChildren();
+  const slots = Math.max(game.maxLength, game.track.length, 1);
+  track.style.setProperty('--slots', slots);
   for (let i = 0; i <= game.track.length; ++i) {
     const gap = document.createElement('button'); gap.className = 'gap'; gap.textContent = i + 1;
+    gap.style.left = `${100 * i / slots}%`;
+    if (i === 0) gap.classList.add('first-gap');
+    if (i === slots) gap.classList.add('last-gap');
     gap.setAttribute('aria-label', `在位置 ${i + 1} 发射`); gap.dataset.position = i + 1;
     gap.addEventListener('click', () => action('shoot', i + 1)); track.append(gap);
     if (i < game.track.length) track.append(ballColumn(game.track[i]));

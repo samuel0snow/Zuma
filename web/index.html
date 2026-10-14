@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101c19">
   <title>Zuma · 五色回廊</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="stylesheet" href="/style.css">
   <script src="/animation.js" defer></script>
   <script src="/app.js" defer></script>
@@ -32,11 +33,11 @@
           <div class="selection-panel">
             <div class="section-heading"><span class="step">01</span><div><p class="eyebrow">开始之前</p><h2>选择你的玩法</h2></div></div>
             <button class="mode-card" data-mode="normal" aria-pressed="true"><span class="mode-icon" aria-hidden="true">○</span><span><strong>经典模式</strong><small>专注颜色与连锁，熟悉每一步。</small></span><span class="choice-mark" aria-hidden="true">✓</span></button>
-            <button class="mode-card" data-mode="special" aria-pressed="false"><span class="mode-icon" aria-hidden="true">✦</span><span><strong>特殊属性模式</strong><small>10% 的惊喜，让轨道多一点变化。</small></span><span class="choice-mark" aria-hidden="true">✓</span></button>
+            <button class="mode-card" data-mode="special" aria-pressed="false"><span class="mode-icon" aria-hidden="true">✦</span><span><strong>特殊属性模式</strong><small>三种属性各 10% 的惊喜，让轨道多一点变化。</small></span><span class="choice-mark" aria-hidden="true">✓</span></button>
             <div id="special-help" class="special-help" hidden>
               <p>带属性的彩球被消除时，触发对应效果：</p>
               <dl><div><dt>Back · 回退</dt><dd>前三颗球退回等待区，随后照常增长。</dd></div><div><dt>Stop · 停滞</dt><dd>后续两个有效回合暂停增长，可叠加。</dd></div><div><dt>Boom · 爆破</dt><dd>清除自身及左右各三格，也可引爆其他属性。</dd></div></dl>
-              <small>初始球和首次入轨的等待球有 10% 概率携带属性；发射球无属性。</small>
+              <small>初始球和首次入轨的等待球有 30% 概率携带属性（Back、Stop、Boom 各 10%）；发射球无属性。</small>
             </div>
             <button id="choose-level" class="primary wide">选择关卡 <span aria-hidden="true">→</span></button>
             <p class="panel-note">每次有效操作后，等待区会进入一个彩球。</p>
@@ -52,7 +53,7 @@
 
       <section id="game-page" aria-labelledby="game-heading" hidden>
         <div class="animation-controls"><span id="animation-status" role="status" aria-live="polite"></span><button id="skip-animation" class="quiet" hidden>跳过动画 →</button></div>
-        <div class="page-heading game-heading"><div><p id="game-mode" class="eyebrow">经典模式</p><h1 id="game-heading">回声之环</h1></div><button id="restart" class="quiet">↺ 重启游戏</button></div>
+        <div class="page-heading game-heading"><div><p id="game-mode" class="eyebrow">经典模式</p><h1 id="game-heading">关卡 1</h1></div><button id="restart" class="quiet">↺ 重启游戏</button></div>
         <div class="stats"><div><span>得分</span><strong id="score">0</strong></div><div><span>已完成回合</span><strong id="turns">0</strong></div><div><span>轨道长度 / 容量</span><strong id="length">0 / 12</strong></div><div class="status-stat"><span>轨道状态</span><strong id="track-status">等待发射</strong></div></div>
 
         <div id="result" class="result" role="status" hidden><span id="result-symbol" class="result-symbol" aria-hidden="true"></span><div><p class="eyebrow">本局结束</p><h2 id="result-title"></h2><p id="result-description"></p></div><button id="result-restart" class="primary">重新开始 →</button></div>
@@ -61,7 +62,7 @@
           <div class="board-panel">
             <div class="board-heading"><h2>彩球轨道</h2><span id="stop-remaining" class="effect" hidden></span></div>
             <p id="track-hint" class="muted">点击编号，将当前球发射到对应间隙。</p>
-            <div class="track-scroll" tabindex="0" aria-label="轨道，可左右滚动"><div id="track" class="track"></div></div>
+            <div class="track-scroll" aria-label="完整彩球轨道"><div id="track" class="track"></div></div>
             <div class="capacity"><span id="capacity-label">还有 6 格空间</span><div class="capacity-bar"><div id="capacity-fill"></div></div></div>
             <div class="feed-header"><h3>等待区</h3><span id="feed-count" class="muted"></span></div>
             <div id="feed" class="feed" tabindex="0" aria-label="等待入轨的彩球"></div>
@@ -73,8 +74,8 @@
       </section>
     </main>
 
-    <footer><span>ZUMA / 五色回廊</span><span>红 R · 绿 G · 蓝 B · 黄 Y · 紫 P</span><a href="/assets/CREDITS.md" target="_blank" rel="noopener">素材来源与署名</a></footer>
+    <footer><span>ZUMA / 五色回廊</span><span>红 · 绿 · 蓝 · 黄 · 紫</span><a href="/assets/CREDITS.md" target="_blank" rel="noopener">素材来源与署名</a></footer>
   </div>
-  <dialog id="rules"><div class="dialog-heading"><p class="eyebrow">玩法说明</p><button id="rules-close" class="quiet" aria-label="关闭玩法说明">关闭 ×</button></div><h2>每一步，都有新的可能。</h2><ol><li>点击轨道间隙的编号，将当前球插入该位置。</li><li>三个或更多同色球连在一起时，整段消除；断口相接还能继续连锁。每消除一球得 10 分。</li><li>每次发射或丢弃后，一个等待球从轨道最前端进入；入轨本身不消除。</li><li>轨道和等待区同时为空则胜利；完成回合后长度超过容量则失败。</li><li>重启会返回玩法选择，并清除本局进度。</li></ol><h3>特殊属性模式</h3><p>属性出现概率为 10%，被消除时触发。</p><dl><div><dt>Back</dt><dd>最多前三颗球按原顺序退回等待区，保留属性；本回合仍正常增长。</dd></div><div><dt>Stop</dt><dd>后续两个有效回合不加入等待球，多次触发累加。</dd></div><div><dt>Boom</dt><dd>清除自身和左右各三格，端点截断，范围内的属性也触发。</dd></div></dl></dialog>
+  <dialog id="rules"><div class="dialog-heading"><p class="eyebrow">玩法说明</p><button id="rules-close" class="quiet" aria-label="关闭玩法说明">关闭 ×</button></div><h2>每一步，都有新的可能。</h2><ol><li>点击轨道间隙的编号，将当前球插入该位置。</li><li>三个或更多同色球连在一起时，整段消除；断口相接还能继续连锁。每消除一球得 10 分。</li><li>每次发射或丢弃后，一个等待球从轨道最前端进入；入轨本身不消除。</li><li>轨道和等待区同时为空则胜利；完成回合后长度超过容量则失败。</li><li>重启会返回玩法选择，并清除本局进度。</li></ol><h3>特殊属性模式</h3><p>Back、Stop、Boom 各有 10% 出现概率，总概率为 30%，被消除时触发。</p><dl><div><dt>Back</dt><dd>最多前三颗球按原顺序退回等待区，保留属性；本回合仍正常增长。</dd></div><div><dt>Stop</dt><dd>后续两个有效回合不加入等待球，多次触发累加。</dd></div><div><dt>Boom</dt><dd>清除自身和左右各三格，端点截断，范围内的属性也触发。</dd></div></dl></dialog>
 </body>
 </html>

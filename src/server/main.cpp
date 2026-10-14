@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     server.set_read_timeout(5, 0); server.set_write_timeout(5, 0);
     const std::string host = "127.0.0.1:" + std::to_string(port);
     const std::string alternateHost = "localhost:" + std::to_string(port);
-    server.set_pre_routing_handler([&](const httplib::Request& request, httplib::Response& response) {
+    const auto checkRequest = [&](const httplib::Request& request, httplib::Response& response) {
         const auto requestedHost = request.get_header_value("Host");
         bool rejected = requestedHost != host && requestedHost != alternateHost;
         if (port == 80 && (requestedHost == "127.0.0.1" || requestedHost == "localhost")) rejected = false;
@@ -53,8 +53,15 @@ int main(int argc, char** argv) {
             return httplib::Server::HandlerResponse::Handled;
         }
         return httplib::Server::HandlerResponse::Unhandled;
+    };
+    server.set_pre_routing_handler([&](const httplib::Request& request, httplib::Response& response) {
+        // POST routes validate after httplib consumes the bounded request body.
+        // Rejecting earlier can reset the socket before Windows delivers the 403.
+        if (request.method == "POST") return httplib::Server::HandlerResponse::Unhandled;
+        return checkRequest(request, response);
     });
     auto route = [&](const httplib::Request& request, httplib::Response& response) {
+        if (checkRequest(request, response) == httplib::Server::HandlerResponse::Handled) return;
         zuma::Json body = zuma::Json::object();
         if (request.method == "POST") {
             try {
@@ -92,8 +99,9 @@ int main(int argc, char** argv) {
     }
     // Assets are explicit routes, never an arbitrary directory mount.
     const std::vector<std::string> assets = {
-        "backgrounds/courtyard.webp", "launcher/pedestal.svg", "track/paving-512x128.jpg",
+        "favicon.svg", "backgrounds/courtyard.webp", "launcher/pedestal.svg", "track/paving-512x128.jpg",
         "balls/vector/red.svg", "balls/vector/green.svg", "balls/vector/blue.svg", "balls/vector/yellow.svg", "balls/vector/purple.svg",
+        "balls/gemstone/red.webp", "balls/gemstone/green.webp", "balls/gemstone/blue.webp", "balls/gemstone/yellow.webp", "balls/gemstone/purple.webp", "launcher/pedestal-painted.webp",
         "icons/ui/back.svg", "icons/ui/stop.svg", "icons/ui/boom.svg", "icons/ui/victory.svg", "icons/ui/defeat.svg",
         "effects/flash-seq/sheet.png", "effects/boom-seq/sheet.png", "effects/ring-seq/sheet.png", "CREDITS.md"
     };

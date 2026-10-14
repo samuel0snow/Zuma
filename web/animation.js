@@ -6,7 +6,13 @@ window.ZumaAnimation = (() => {
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const names = {insert:'彩球发射',discard:'丢弃当前球',eliminate:'同色消除',chain_eliminate:'连锁消除',boom:'Boom · 爆破',stop_trigger:'Stop · 停滞生效',back:'Back · 彩球回退',stop_skip:'Stop · 本回合停滞中',feed:'等待球入轨',ammo_update:'弹药更新',turn_end:'回合结束',won:'胜利',lost:'本局结束'};
   const elements = () => new Map([...document.querySelectorAll('#track [data-ball-id], #feed [data-ball-id]')].map(element => [element.dataset.ballId, element]));
-  const rect = element => element?.querySelector('.ball')?.getBoundingClientRect();
+  const rect = element => {
+    const box = element?.querySelector('.ball')?.getBoundingClientRect();
+    if (!box || box.right <= 0 || box.left >= innerWidth || box.bottom <= 0 || box.top >= innerHeight) return null;
+    const region = element.closest('.track-scroll, .feed')?.getBoundingClientRect();
+    if (region && (box.right <= region.left || box.left >= region.right || box.bottom <= region.top || box.top >= region.bottom)) return null;
+    return box;
+  };
   async function animate(element, frames, duration) {
     if (skip || reduced() || document.hidden || !element?.animate) return;
     const animation = element.animate(frames, {duration, easing:'cubic-bezier(.2,.65,.3,1)', fill:'both'});
@@ -28,9 +34,11 @@ window.ZumaAnimation = (() => {
     const counts = {boom:12,flash:12,ring:8};
     const element = document.createElement('span'); element.className = `sprite-effect sprite-${kind}`;
     element.setAttribute('aria-hidden','true');
-    const size = kind === 'boom' ? 132 : 90;
+    const size = Math.min(kind === 'boom' ? 132 : 90, box.width * (kind === 'boom' ? 2.4 : 1.8));
     Object.assign(element.style,{left:`${box.left+box.width/2-size/2}px`,top:`${box.top+box.height/2-size/2}px`,width:`${size}px`,height:`${size}px`,backgroundImage:`url('${sources[kind]}')`,backgroundSize:`${counts[kind]*100}% 100%`});
     document.body.append(element);
+    const arena = document.querySelector('.board-panel').getBoundingClientRect();
+    element.style.clipPath = `inset(${Math.max(0,arena.top-parseFloat(element.style.top))}px ${Math.max(0,parseFloat(element.style.left)+size-arena.right)}px ${Math.max(0,parseFloat(element.style.top)+size-arena.bottom)}px ${Math.max(0,arena.left-parseFloat(element.style.left))}px)`;
     try {
       if (element.animate) {
         const effect = element.animate([{backgroundPosition:'0% 0%'},{backgroundPosition:'100% 0%'}],{duration,easing:`steps(${counts[kind]-1})`,fill:'forwards'});
