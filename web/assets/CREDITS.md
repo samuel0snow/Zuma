@@ -98,3 +98,8 @@ https://github.com/lucide-icons/lucide/blob/main/LICENSE 。
 - `backgrounds/courtyard.webp`：2026-10-13 使用内置 imagegen 生成的石庭背景，1672×941 原生画布；仅转换为 WebP，约 120KB。生成提示词及制作方式见 `docs/背景生成记录.md`。
 
 运行包与源码包保留本文件、素材作者与来源链接。网页页脚有可见的素材署名入口。
+
+## 8. 视觉升级素材
+
+- `balls/gemstone/*.webp`、`launcher/pedestal-painted.webp`：2026-10-13 使用内置 imagegen 生成，透明背景；等比缩小及 WebP 编码。完整提示词与制作流程见 `docs/背景生成记录.md`。页面现在使用此套素材，旧 Kenney 球与自绘 SVG 仍作为候选保留。
+- `favicon.svg`：本项目自绘的玉色球与 Z 字标，用于浏览器标签页。
