@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """把已核实的免费美术素材整理成 web/assets/ 下的候选资源。
 
-素材来源与许可见 web/assets/CREDITS.md 与 docs/美术资源候选清单.md。
+素材来源与许可见 web/assets/CREDITS.md 与 docs/美术资源/美术资源候选清单.md。
 脚本只做"复制 + 派色 + 抽帧 + 裁切"，不改动下载目录里的原件。
 
 用法（在项目根目录）：
@@ -40,7 +40,7 @@ EGG_BLAST = {
     "purple": "EggPurp.png",
 }
 
-# 主选按"32px 下仍能辨认 + 实心风格统一"从候选里挑出，见 docs/美术资源候选清单.md。
+# 主选按"32px 下仍能辨认 + 实心风格统一"从候选里挑出，见 docs/美术资源/美术资源候选清单.md。
 GAME_ICONS = {
     "back.svg": "game-icons_lorc_back-forth.svg",
     "stop.svg": "game-icons_lorc_stopwatch.svg",

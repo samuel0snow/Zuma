@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* Design tokens: docs/Zuma 统一界面视觉规范.md */
+/* Design tokens: docs/页面设计/Zuma 统一界面视觉规范.md */
 :root {
   color-scheme: dark;
   --bg: #101c19;

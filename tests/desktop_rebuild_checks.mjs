@@ -1,4 +1,4 @@
-// Desktop-only acceptance for docs/网页再建设报告.md.
+// Desktop-only acceptance for docs/页面设计/网页再建设报告.md.
 import {chromium} from '../build/browser-test-deps/node_modules/playwright/index.mjs';
 import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';

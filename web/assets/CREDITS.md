@@ -32,7 +32,7 @@
 | 16 toon muzzle flash | zisongbr | https://opengameart.org/content/16-toon-muzzle-flash | **CC0** | `effects/muzzle-flash-seq/00-11.png` |
 
 **改动说明**：序列帧用等距抽帧从原始 20–40 帧压到 8–12 帧，编号两位、从 `00` 开始。
-帧率与循环建议见 `docs/美术资源候选清单.md`。CC0 不要求署名，此处记录仅为可追溯。
+帧率与循环建议见 `docs/美术资源/美术资源候选清单.md`。CC0 不要求署名，此处记录仅为可追溯。
 
 ## 3. ambientCG（CC0）
 
@@ -95,11 +95,11 @@ https://github.com/lucide-icons/lucide/blob/main/LICENSE 。
 - `icons/ui/*.svg`：基于本文件第 4 节的 Lorc 图标（CC BY 3.0），删除黑色背景矩形并改为暖金色，原始版本未覆盖。署名：Icons made by Lorc, available on https://game-icons.net (CC BY 3.0). Modified for Zuma: transparent background, gold color and fixed canvas size. 许可链接：https://creativecommons.org/licenses/by/3.0/ 。
 - `effects/{flash-seq,boom-seq,ring-seq}/sheet.png`：由 rubberduck 的 CC0 单帧序列横向排列，分别 12、12、8 帧，单帧 128×128。排列未改变帧内容；网页按需播放。普通闪光通过 CSS 灰度和亮度处理，避免紫色素材影响五色球的辨识。
 - `launcher/pedestal.svg`：本项目自绘，512×512 透明 SVG；可编辑石质底座，不包含球或文字。
-- `backgrounds/courtyard.webp`：2026-10-13 使用内置 imagegen 生成的石庭背景，1672×941 原生画布；仅转换为 WebP，约 120KB。生成提示词及制作方式见 `docs/背景生成记录.md`。
+- `backgrounds/courtyard.webp`：2026-10-13 使用内置 imagegen 生成的石庭背景，1672×941 原生画布；仅转换为 WebP，约 120KB。生成提示词及制作方式见 `docs/美术资源/背景生成记录.md`。
 
 运行包与源码包保留本文件、素材作者与来源链接。网页页脚有可见的素材署名入口。
 
 ## 8. 视觉升级素材
 
-- `balls/gemstone/*.webp`、`launcher/pedestal-painted.webp`：2026-10-13 使用内置 imagegen 生成，透明背景；等比缩小及 WebP 编码。完整提示词与制作流程见 `docs/背景生成记录.md`。页面现在使用此套素材，旧 Kenney 球与自绘 SVG 仍作为候选保留。
+- `balls/gemstone/*.webp`、`launcher/pedestal-painted.webp`：2026-10-13 使用内置 imagegen 生成，透明背景；等比缩小及 WebP 编码。完整提示词与制作流程见 `docs/美术资源/背景生成记录.md`。页面现在使用此套素材，旧 Kenney 球与自绘 SVG 仍作为候选保留。
 - `favicon.svg`：本项目自绘的玉色球与 Z 字标，用于浏览器标签页。

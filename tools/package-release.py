@@ -58,7 +58,7 @@ def main():
         runtime_web(args.build/"web",runtime/"web")
         for name in ["README.md", "docs"]:
             copy(ROOT / name, runtime / name)
-        copy(ROOT / "docs/运行与交付说明.md", runtime / "运行说明.md")
+        copy(ROOT / "docs/交付说明/运行与交付说明.md", runtime / "运行说明.md")
         (runtime / "启动GUI.cmd").write_text('@echo off\r\ncd /d "%~dp0"\r\nzuma_gui.exe\r\npause\r\n', encoding="ascii")
         (runtime / "启动CLI.cmd").write_text('@echo off\r\ncd /d "%~dp0"\r\nzuma.exe\r\npause\r\n', encoding="ascii")
         manifest = {}
