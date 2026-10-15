@@ -47,6 +47,8 @@ window.ZumaAnimation = (() => {
     } finally { element.remove(); }
   }
   async function transition(event, render) {
+    const launchBox = event.type === 'insert' ? document.querySelector('#current-ball .ball')?.getBoundingClientRect() : null;
+    if (event.type === 'insert') document.body.dataset.launcherEmpty = 'true';
     const before = elements();
     const positions = new Map([...before].map(([id,element])=>[id,rect(element)]));
     const moving = ['insert','feed','back'].includes(event.type);
@@ -75,7 +77,7 @@ window.ZumaAnimation = (() => {
       const target = rect(after.get(id));
       if (!target || !moving) continue;
       let source = positions.get(id);
-      if (event.type === 'insert') source = document.querySelector('#current-ball .ball')?.getBoundingClientRect();
+      if (event.type === 'insert') source = launchBox;
       let copy = originals.get(id);
       if (!copy && source) copy = ghost(destination,source);
       if (copy && source) {
@@ -106,6 +108,7 @@ window.ZumaAnimation = (() => {
       await animate(document.querySelector('.board-panel'),[{boxShadow:'0 0 0 0 #e4bd7b00'},{boxShadow:'0 0 0 3px #e4bd7b99'},{boxShadow:'0 0 0 0 #e4bd7b00'}],300);render(event.snapshot);
     } else if (event.type === 'spit') {
       const source=document.querySelector('#current-ball .ball'),box=source?.getBoundingClientRect(),copy=ghost(source,box);
+      document.body.dataset.launcherEmpty = 'true';
       try {
         if(copy&&box){const target=window.ZumaStage.boxAt(event.aim.destination),scale=window.ZumaStage.scale;source.style.visibility='hidden';await animate(copy,[{transform:'translate(0,0)',opacity:1},{transform:`translate(${(target.left-box.left)/scale}px,${(target.top-box.top)/scale}px)`,opacity:1,offset:.94},{transform:`translate(${(target.left-box.left)/scale}px,${(target.top-box.top)/scale}px)`,opacity:0}],350);}
       }finally{if(source)source.style.visibility='';copy?.remove();}
@@ -113,6 +116,7 @@ window.ZumaAnimation = (() => {
     } else if (event.type === 'discard') {
       await animate(document.querySelector('#current-ball .ball'),[{transform:'translateY(0)',opacity:1},{transform:'translateY(28px) scale(.4)',opacity:0}],220);render(event.snapshot);
     } else if (event.type === 'ammo_update') {
+      delete document.body.dataset.launcherEmpty;
       render(event.snapshot); await animate(document.querySelector('#current-ball .ball'),[{transform:'scale(.6)',opacity:.3},{transform:'scale(1)',opacity:1}],180);
     } else if (['insert','feed','back'].includes(event.type)) await transition(event,render);
     else render(event.snapshot);
@@ -132,6 +136,7 @@ window.ZumaAnimation = (() => {
     } finally {
       for(const animation of active)animation.cancel();active.clear();
       document.querySelectorAll('.animation-ghost,.sprite-effect').forEach(element=>element.remove());
+      delete document.body.dataset.launcherEmpty;
       delete document.body.dataset.animating;
       document.getElementById('skip-animation').hidden=true;
       document.getElementById('animation-status').textContent='';

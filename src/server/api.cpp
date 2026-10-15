@@ -112,8 +112,14 @@ ApiResponse GameApi::handle(const std::string& method, const std::string& path, 
     try {
         if (method == "GET" && path == "/api/game") return {200, {{"state", state()}}};
         if (method == "GET" && path == "/api/history") return {200, {{"turns", history_}}};
-        if (method == "GET" && path == "/api/maps") return {200, {{"maps", Json::array({
-            {{"id","straight"},{"title","直线地图"}},{{"id","spiral"},{"title","螺旋类环形地图"}},{{"id","s"},{"title","S 形地图"}}})}}};
+        if (method == "GET" && path == "/api/maps") {
+            Json maps=Json::array();
+            for (const auto& id : {"straight", "spiral", "s"}) {
+                const auto geometry=makeMap(id,30);
+                maps.push_back({{"id",id},{"title",geometry.title},{"geometry",mapJson(geometry)}});
+            }
+            return {200, {{"maps",maps}}};
+        }
         if (method == "GET" && path == "/api/levels") {
             Json levels = Json::array();
             for (int id : catalog_()) {

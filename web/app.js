@@ -61,7 +61,9 @@ function ballColumn(item) {
   if (item.special) {
     const label = document.createElement('span'); label.className = 'special-tag';
     const image = document.createElement('img');image.src=`/assets/icons/ui/${item.special.toLowerCase()}.svg`;image.alt='';image.addEventListener('error',()=>image.remove(),{once:true});
-    label.append(image,document.createTextNode(item.special));column.append(label);
+    label.title = `${item.special}：${{Back:'前三颗球回退',Stop:'暂停增长两回合',Boom:'清除左右各三格'}[item.special] || ''}`;
+    label.setAttribute('aria-label',label.title);label.tabIndex=0;
+    const text=document.createElement('span');text.textContent=item.special;label.append(image,text);column.append(label);
   }
   return column;
 }
@@ -75,7 +77,7 @@ function renderLevels() {
     const preview = document.createElement('div'); preview.className = 'level-preview';
     for (const color of level.active || '') preview.append(ball(color));
     const detail = document.createElement('div'); detail.className = 'level-detail';
-    detail.textContent = level.available ? `轨道容量 ${level.maxLength}   /   等待彩球 ${level.feedCount}` : `关卡暂不可用：${level.error}`;
+    detail.textContent = level.available ? `初始 ${level.active.length} 颗 · 容量 ${level.maxLength} · 等待 ${level.feedCount} 颗` : `关卡暂不可用：${level.error}`;
     const start = document.createElement('button'); start.className = 'primary wide'; start.dataset.level = level.id; start.textContent = '开始游戏 →'; start.setAttribute('aria-label',`开始关卡 ${level.id}`); start.addEventListener('click', () => startGame(level.id));
     card.append(title, preview, detail, start); container.append(card);
   }
@@ -93,7 +95,7 @@ function renderGame(game = state) {
   $('finish-game').hidden = finished;
   document.querySelector('.ammo-panel').hidden = finished;
   document.querySelector('.events-panel').hidden = finished;
-  $('track-status').textContent = game.status === 'won' ? '全部清空' : game.status === 'lost' ? '超出容量' : game.stoppedTurns ? '停滞中' : game.track.length === game.maxLength ? '轨道已满' : '等待发射';
+  $('track-status').textContent = game.status === 'ended' ? '本局已结束' : game.status === 'won' ? '全部清空' : game.status === 'lost' ? '超出容量' : game.stoppedTurns ? '停滞中' : game.track.length === game.maxLength ? '轨道已满' : '等待发射';
   $('track-hint').textContent = finished ? '本局已结束，可查看复盘或重新选择玩法、地图与关卡。' : '移动鼠标瞄准，点击舞台发射。未命中会吐球并消耗回合。';
   $('stop-remaining').hidden = finished || !game.stoppedTurns; $('stop-remaining').textContent = `停滞剩余: ${game.stoppedTurns} 回合`;
   window.ZumaStage.render(game,ballColumn);
@@ -243,7 +245,24 @@ function startGame(id) { return mutate('/api/game', {levelId:id, specialsEnabled
 function action(type, position) { return mutate('/api/action', type === 'shoot' ? {type, position} : {type}); }
 async function restart() { await mutate('/api/reset'); }
 for (const button of document.querySelectorAll('[data-mode]')) button.addEventListener('click', () => selectMode(button.dataset.mode === 'special'));
-$('choose-level').addEventListener('click',()=>{$('map-mode').textContent=specials?'特殊属性模式':'经典模式';showView('map');notice();});
+$('choose-level').addEventListener('click',async()=>{
+  $('map-mode').textContent=specials?'特殊属性模式':'经典模式';showView('map');notice();
+  try {
+    const {maps}=await request('/api/maps');
+    for(const item of maps){
+      const scene=document.querySelector(`[data-map="${item.id}"] svg`),m=item.geometry;
+      scene.replaceChildren();scene.setAttribute('viewBox',`0 0 ${m.width} ${m.height}`);
+      const add=(name,attrs)=>{const e=document.createElementNS(scene.namespaceURI,name);for(const [k,v]of Object.entries(attrs))e.setAttribute(k,v);scene.append(e);return e;};
+      const points=m.path.map(p=>p.join(',')).join(' ');
+      add('polyline',{points,class:'preview-rim'});add('polyline',{points,class:'preview-stone'});
+      const previewScale=Math.min(scene.clientWidth/m.width,180/m.height),previewBall=Math.max(m.diameter,12/previewScale);
+      for(let i=0;i<5;i++){const p=ZumaStage.at(m,m.diameter+i*Math.max(m.pitch,previewBall*1.35));add('image',{href:`/assets/balls/gemstone/${['red','green','blue','yellow','purple'][i]}.webp`,x:p.x-previewBall/2,y:p.y-previewBall/2,width:previewBall,height:previewBall});}
+      const baseSize=Math.max(144,44/previewScale),orbSize=baseSize*68/144;
+      add('image',{href:'/assets/launcher/pedestal-painted.webp',x:m.launcher.x-baseSize/2,y:m.launcher.y-orbSize/2,width:baseSize,height:baseSize});
+      add('image',{href:'/assets/balls/gemstone/blue.webp',x:m.launcher.x-orbSize/2,y:m.launcher.y-orbSize/2,width:orbSize,height:orbSize});
+    }
+  }catch{notice('地图预览暂未加载，仍可选择地图。');}
+});
 for(const button of document.querySelectorAll('[data-map]'))button.addEventListener('click',()=>{selectedMap=button.dataset.map;chooseLevels();});
 $('back-mode').addEventListener('click', () => { showView('mode'); notice(); });
 $('back-map').addEventListener('click',()=>{showView('map');notice();});

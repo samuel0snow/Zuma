@@ -123,15 +123,18 @@ body[data-view=game] .shell { max-width: 1320px; padding: 0 var(--space-6); }
 .map-card svg { width: 100%; height: 180px; display: block; margin-bottom: var(--space-4); }
 .map-card path { fill: none; stroke: #a5aa80; stroke-width: 9; stroke-linecap: round; }
 .map-card circle { fill: var(--jade); stroke: var(--gold); stroke-width: 3; }
+.map-card polyline { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.preview-rim { stroke: #8d8c64; stroke-width: 30; }
+.preview-stone { stroke: #425745; stroke-width: 21; }
 .map-card strong { display: block; font-size: var(--font-card); font-weight: 600; margin-bottom: var(--space-2); line-height: 1.4; }
 .map-card span { display: block; font-size: var(--font-small); color: var(--muted); }
 .level-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: var(--space-6); }
 .level-card { display: flex; flex-direction: column; }
 .level-card h2 { font-size: var(--font-card); }
-.level-preview { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-6) 0; }
-.level-preview .ball { width: 42px; height: 42px; min-width: 42px; }
+.level-preview { display: flex; flex-wrap: wrap; align-content: start; gap: var(--space-2); min-height: 142px; margin: var(--space-4) 0; }
+.level-preview .ball { width: 38px; height: 38px; min-width: 38px; }
 .level-detail { margin-top: auto; color: var(--muted); font-size: var(--font-small); }
-.level-card .primary { margin-top: var(--space-6); }
+.level-card .primary { margin-top: var(--space-4); }
 
 /* Ball artwork and attribute labels; map sizes stay in world coordinates. */
 .ball { position: relative; display: block; width: 48px; height: 48px; min-width: 48px; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 30% 24%,#fffa,transparent 32%),var(--ball-color); box-shadow: 0 3px 8px #0006; isolation: isolate; }
@@ -151,7 +154,8 @@ body[data-view=game] .shell { max-width: 1320px; padding: 0 var(--space-6); }
 .game-heading { width: var(--play-width,100%); max-width: 100%; margin: var(--space-3) auto var(--space-2); }
 .game-heading h1 { font-size: var(--font-game); line-height: 1.3; margin: 0; }
 .game-heading .eyebrow { margin-bottom: var(--space-1); }
-.game-actions { display: flex; align-items: center; gap: var(--space-2); }
+.game-actions { display: flex; align-items: center; gap: var(--space-3); }
+#finish-game { color: var(--danger); border-color: #d6a08555; }
 .stats { display: flex; align-items: center; gap: var(--space-6); width: var(--play-width,100%); max-width: 100%; margin: 0 auto var(--space-3); color: var(--muted); font-size: var(--font-small); line-height: 1.4; }
 .stats > div { display: flex; align-items: center; gap: var(--space-2); }
 .stats strong { font-size: var(--font-card); color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -166,18 +170,16 @@ body[data-animating=true] .game-actions { visibility: hidden; }
 .board-heading h2 span { font-size: var(--font-small); color: var(--muted); font-weight: 400; margin-left: var(--space-3); }
 .board-panel > .muted { font-size: var(--font-small); }
 .game-sidebar { display: grid; gap: var(--space-5); padding-top: var(--space-9); }
-.game-resources { padding: var(--space-5); background: var(--surface-helper); }
+.game-resources { padding: var(--space-4); background: #14271c99; box-shadow: none; }
 .feed-header { margin-bottom: var(--space-3); }
 .feed-header h3 { font-size: var(--font-section); margin-bottom: var(--space-1); }
 .feed-header .muted { font-size: var(--font-small); }
-.feed { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-3) var(--space-2); min-height: 28px; width: 100%; }
-.feed .track-ball { width: 28px; }
-.feed .ball { width: 28px; height: 28px; min-width: 28px; }
+.feed { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-2); min-height: 24px; width: 100%; }
+.feed .track-ball { width: 24px; }
+.feed .ball { width: 24px; height: 24px; min-width: 24px; }
 .feed .special-tag { font-size: 8px; padding: 1px 2px; gap: 2px; }
 .feed .special-tag img { width: 9px; height: 9px; }
 .ammo-panel { display: grid; gap: var(--space-3); padding-top: var(--space-4); margin-top: var(--space-4); border-top: 1px solid var(--line); }
-.ammo-next { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-.ammo-next .ball { width: 32px; height: 32px; min-width: 32px; }
 .ammo-panel .secondary { width: 100%; }
 .events-panel { display: grid; gap: var(--space-2); padding: 0 var(--space-1); }
 .events-panel h2 { font-size: var(--font-small); font-weight: 600; color: var(--gold); }
@@ -198,7 +200,7 @@ body[data-animating=true] .game-actions { visibility: hidden; }
 .ended-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--gold); background: #d8bd7655; font-size: 24px; font-weight: 700; }
 
 /* Map scene, aim preview and clipped animation layer */
-.game-stage { position: relative; isolation: isolate; width: 100%; height: var(--stage-height); max-height: var(--stage-height); margin: var(--space-3) auto 0; overflow: hidden; border: 1px solid #a2ad7966; border-radius: var(--radius-card); background: linear-gradient(#153b1c20,#10251b44),url('/assets/backgrounds/courtyard.webp') center/cover; box-shadow: var(--shadow-card); cursor: crosshair; }
+.game-stage { position: relative; isolation: isolate; width: 100%; height: var(--stage-height); max-height: var(--stage-height); margin: var(--space-3) auto 0; overflow: hidden; border: 1px solid #a2ad7966; border-radius: var(--radius-card); background: radial-gradient(ellipse at 45% 40%,#304332,#15271f 78%); box-shadow: var(--shadow-card); cursor: crosshair; }
 .game-stage[aria-disabled=true] { cursor: default; }
 .stage-scene { position: absolute; transform-origin: top left; overflow: hidden; }
 .stage-path, .aim-overlay, .stage-effects { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -208,13 +210,20 @@ body[data-animating=true] .game-actions { visibility: hidden; }
 .stage-track { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
 .stage-track > .track-ball { position: absolute; width: var(--orb); height: var(--orb); transform-origin: calc(var(--orb)/2) calc(var(--orb)/2); }
 .stage-track .ball { width: var(--orb); height: var(--orb); min-width: var(--orb); flex-shrink: 0; }
-.stage-track .special-tag { position: absolute; top: calc(var(--orb) + 1px); font-size: var(--tag-size,11px); box-shadow: 0 2px 5px #07140dbb; }
-.stage-track .special-tag img { width: var(--tag-size,11px); height: var(--tag-size,11px); }
+.stage-track .special-tag { pointer-events: auto; z-index: 2; cursor: help; position: absolute; top: calc(var(--orb) + 1px); font-size: var(--tag-size,11px); box-shadow: 0 2px 5px #07140dbb; }
+.stage-track .special-tag img { width: var(--tag-icon,14px); height: var(--tag-icon,14px); }
+.compact-attributes .special-tag > span { display: none; }
+.stage-track .special-tag:focus-visible { outline-offset: 1px; }
 .stage-track .aim-target .ball { filter: brightness(1.2); outline: 2px solid #f0d896; outline-offset: 3px; }
 .stage-launcher { position: absolute; z-index: 3; transform-origin: 50% 0; transform: translate(-50%,calc(-34px * var(--launcher-scale,1))) scale(var(--launcher-scale,1)); pointer-events: none; }
 .ammo-current { position: relative; width: 144px; height: 144px; display: flex; justify-content: center; align-items: flex-start; background: url('/assets/launcher/pedestal-painted.webp') center bottom/144px 144px no-repeat; }
 .ammo-current:before { content: ""; position: absolute; left: 50%; top: 64px; transform: translateX(-50%); width: 55px; height: 13px; border-radius: 50%; background: #07170eca; filter: blur(3px); }
 .ammo-current .ball { width: 68px; height: 68px; min-width: 68px; z-index: 1; }
+.launcher-next { position: absolute; left: 146px; top: 34px; display: grid; justify-items: center; gap: 4px; white-space: nowrap; color: var(--muted); font-size: 22px; line-height: 1.2; }
+.launcher-next .ball { width: 48px; height: 48px; min-width: 48px; }
+body[data-launcher-empty] #current-ball { visibility: hidden; }
+.finished .launcher-next { display: none; }
+.finished .stage-launcher { opacity: .45; filter: saturate(.4); }
 .path-shadow, .path-rim, .path-stone, .path-detail, .path-unused { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .path-shadow { stroke: #07120adc; stroke-width: 38; }
 .path-rim { stroke: #717255; stroke-width: 28; }
@@ -225,12 +234,12 @@ body[data-animating=true] .game-actions { visibility: hidden; }
 .path-entry { fill: var(--jade); stroke: #283c2d; stroke-width: 3; }
 .path-end { fill: #ecc18b; stroke: #48382e; stroke-width: 3; }
 .path-finish-gate { stroke: #f4bb81; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 3px #f6bc7777); }
-.path-label { fill: #c6d1b2; font: 17px "Microsoft YaHei",sans-serif; paint-order: stroke; stroke: #14251c; stroke-width: 5; stroke-linejoin: round; }
+.path-label { fill: #c6d1b2; font: var(--path-label-size,17px) "Microsoft YaHei",sans-serif; paint-order: stroke; stroke: #14251c; stroke-width: 5; stroke-linejoin: round; }
 .finish-label { fill: #ffe3ae; }
 .aim-ray { stroke: #f2d98b; stroke-width: 2; stroke-dasharray: 9 6; opacity: .85; }
 .aim-miss { stroke: #dfaa8c; opacity: .6; }
 .aim-divider { stroke: #dbeac9; stroke-width: 1.5; stroke-dasharray: 4 5; opacity: .75; }
-.aim-insert { fill: #f2d98b33; stroke: #f2d98b; stroke-width: 3; }
+.aim-insert { r: var(--mark-radius,12px); fill: #f2d98b66; stroke: #fff0b1; stroke-width: var(--preview-stroke,3px); }
 .aim-edge { fill: #e3b59433; stroke: #e3b594; stroke-width: 2; }
 .aim-status { position: absolute; left: var(--space-3); bottom: var(--space-3); padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: var(--radius-control); background: #12261ddd; color: var(--gold); font-size: var(--font-micro); line-height: 1.4; pointer-events: none; z-index: 8; }
 .animation-ghost { position: absolute !important; margin: 0 !important; z-index: 5 !important; pointer-events: none; transform-origin: top left; }

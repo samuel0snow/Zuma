@@ -42,7 +42,7 @@ MapGeometry makeMap(const std::string& id, std::size_t capacity) {
     MapGeometry map; map.id=id;
     const double total=map.diameter*2+(capacity+1)*map.pitch;
     if (id=="straight") {
-        map.title="直线地图"; map.path={{0,0},{total,0}}; map.launcher={total/2,250};
+        map.title="直线地图"; map.path={{0,0},{total,0}}; map.launcher={total/2,std::max(340.0,total*.32)};
     } else if (id=="s") {
         map.title="S 形地图";
         line(map.path,{540,0},{160,0});
@@ -68,7 +68,7 @@ MapGeometry makeMap(const std::string& id, std::size_t capacity) {
         for(auto& p:map.path) {p.x*=scale;p.y*=scale;}
         map.launcher.x*=scale;map.launcher.y*=scale;
     }
-    double minX=map.launcher.x-85,maxX=map.launcher.x+85,minY=map.launcher.y-45,maxY=map.launcher.y+110;
+    double minX=map.launcher.x-85,maxX=map.launcher.x+85,minY=map.launcher.y-45,maxY=map.launcher.y+(id=="straight"?380:220);
     for(auto p:map.path) {minX=std::min(minX,p.x);maxX=std::max(maxX,p.x);minY=std::min(minY,p.y);maxY=std::max(maxY,p.y);}
     const double pad=map.safetyMargin;
     for(auto& p:map.path) {p.x+=pad-minX;p.y+=pad-minY;}

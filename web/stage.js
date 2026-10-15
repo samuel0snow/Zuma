@@ -58,6 +58,15 @@ window.ZumaStage = (() => {
     scene.style.width=`${map.width}px`;scene.style.height=`${map.height}px`;
     scene.style.left='0px';scene.style.top='0px';
     scene.style.transform=`scale(${scale})`;
+    scene.style.setProperty('--launcher-scale',Math.max(map.diameter/68,48/(68*scale)));
+    scene.style.setProperty('--tag-size',`${12/scale}px`);
+    scene.style.setProperty('--tag-icon',`${14/scale}px`);
+    scene.style.setProperty('--mark-radius',`${7/scale}px`);
+    scene.style.setProperty('--path-label-size',`${12/scale}px`);
+    scene.style.setProperty('--preview-stroke',`${2/scale}px`);
+    scene.classList.toggle('compact-attributes',map.diameter*scale<38);
+    for(const label of $('stage-path').querySelectorAll('.path-label'))label.setAttribute('y',Math.max(16/scale,Math.min(map.height-16/scale,Number(label.getAttribute('y')))));
+
   }
   function finish(m,capacity){const distance=Math.min(m.distances.at(-1),m.diameter+(capacity-.5)*m.pitch);return {distance,point:at(m,distance)};}
   function drawPath(path,m,capacity) {
@@ -98,6 +107,7 @@ window.ZumaStage = (() => {
   }
   function render(next,ballColumn) {
     if(next.sessionId!==game?.sessionId)direction={x:0,y:-1};
+    $('game-stage').dataset.map=next.mapId;
     game=next;const changed=map!==next.map;map=next.map;if(!map)return;
     document.querySelector('.game-layout').style.setProperty('--map-ratio',map.width/map.height);
     $('stage-scene').style.setProperty('--orb',`${map.diameter}px`);
@@ -120,14 +130,16 @@ window.ZumaStage = (() => {
       const vector={x:(event.clientX-box.left)/scale-map.launcher.x,y:(event.clientY-box.top)/scale-map.launcher.y};
       if(Math.hypot(vector.x,vector.y)>1){direction=vector;preview();}
     });
-    stage.addEventListener('click',()=>{if(!locked)fire({...direction});});
+    stage.addEventListener('click',event=>{if(!locked&&!event.target.closest('.special-tag'))fire({...direction});});
     stage.addEventListener('keydown',event=>{
-      if(locked)return;
+      if(locked||event.target.closest('.special-tag'))return;
       if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) {
         event.preventDefault();const angle=Math.atan2(direction.y,direction.x)+(event.key==='ArrowLeft'||event.key==='ArrowUp'?-.045:.045);
         direction={x:Math.cos(angle),y:Math.sin(angle)};preview();
       }else if(event.key===' '||event.key==='Enter'){event.preventDefault();fire({...direction});}
     });
+    stage.addEventListener('focusin',event=>{const tag=event.target.closest('.special-tag');if(tag)$('aim-status').textContent=tag.title;});
+    stage.addEventListener('focusout',()=>preview());
     new ResizeObserver(fit).observe(stage);
   }
   function boxAt(point,diameter=map.diameter){const box=$('stage-scene').getBoundingClientRect();return {left:box.left+(point.x-diameter/2)*scale,top:box.top+(point.y-diameter/2)*scale,width:diameter*scale,height:diameter*scale};}

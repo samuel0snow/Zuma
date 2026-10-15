@@ -59,7 +59,7 @@
 
       <section id="game-page" aria-labelledby="game-heading" hidden>
         <div class="animation-controls"><span id="animation-status" role="status" aria-live="polite"></span><button id="skip-animation" class="quiet" hidden>跳过动画 →</button></div>
-        <div class="page-heading game-heading"><div><p id="game-mode" class="eyebrow">经典模式</p><h1 id="game-heading">关卡 1</h1></div><div class="game-actions"><button id="finish-game" class="quiet" type="button">结束本局</button><button id="restart" class="quiet">↺ 重启游戏</button></div></div>
+        <div class="page-heading game-heading"><div><p id="game-mode" class="eyebrow">经典模式</p><h1 id="game-heading">关卡 1</h1></div><div class="game-actions"><button id="finish-game" class="quiet" type="button">结束本局</button><button id="restart" class="quiet" title="返回玩法选择，当前局及复盘将被清除">← 返回选择</button></div></div>
         <div class="stats"><div><span>得分</span><strong id="score">0</strong></div><div><span>回合</span><strong id="turns">0</strong></div><div class="status-stat"><strong id="track-status">等待发射</strong></div></div>
 
         <div class="game-layout">
@@ -70,7 +70,7 @@
               <div id="stage-scene" class="stage-scene">
                 <svg id="stage-path" class="stage-path" aria-hidden="true"></svg>
                 <div id="track" class="track stage-track"></div>
-                <div class="stage-launcher"><div class="ammo-current"><div id="current-ball" aria-label="当前彩球"></div></div></div>
+                <div class="stage-launcher"><div class="ammo-current"><div id="current-ball" aria-label="当前彩球"></div></div><div class="launcher-next"><span>下一颗</span><div id="next-ball" aria-label="下一颗彩球"></div></div></div>
                 <svg id="aim-overlay" class="aim-overlay" aria-hidden="true"></svg>
                 <div id="stage-effects" class="stage-effects" aria-hidden="true"></div>
               </div>
@@ -82,7 +82,7 @@
             <section class="game-resources" aria-label="待入轨与发射彩球">
               <div class="feed-header"><h3>等待区</h3><span id="feed-count" class="muted"></span></div>
               <div id="feed" class="feed" tabindex="0" aria-label="等待入轨的彩球"></div>
-              <div class="ammo-panel" aria-label="下一颗彩球与丢弃操作"><div class="ammo-next"><span class="muted">下一颗</span><div id="next-ball"></div></div><button id="discard" class="secondary">丢弃当前球</button></div>
+              <div class="ammo-panel" aria-label="丢弃操作"><button id="discard" class="secondary">丢弃当前球</button></div>
             </section>
             <section class="events-panel" aria-labelledby="events-heading"><h2 id="events-heading">本回合</h2><div id="events" role="status" aria-live="polite">选好位置，开始你的第一步。</div><details id="event-details" hidden><summary>查看回合详情</summary><div id="event-list"></div></details></section>
           </aside>
