@@ -1,0 +1,730 @@
+[
+  {
+    "name": "1280-mode",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      }
+    ]
+  },
+  {
+    "name": "1280-special",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      }
+    ]
+  },
+  {
+    "name": "1280-maps",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      }
+    ]
+  },
+  {
+    "name": "1280-levels",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      }
+    ]
+  },
+  {
+    "name": "1280-spiral",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          48,
+          48
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          46.58819580078125,
+          18.628692626953125
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          33.88232421875,
+          33.882354736328125
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1280-turn",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "ball color-G ",
+        "size": [
+          48,
+          48
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          46.58819580078125,
+          18.628692626953125
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-R ",
+        "size": [
+          33.88232421875,
+          33.882354736328125
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1280-ended",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "ball color-G ",
+        "size": [
+          48,
+          48
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-R ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1280-recap",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      1461
+    ],
+    "launcher": [
+      {
+        "type": "ball color-G ",
+        "size": [
+          48,
+          48
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-R ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1280-straight",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          48,
+          47.99993896484375
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          46.58819580078125,
+          18.628662109375
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          33.88238525390625,
+          33.88238525390625
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1280-s",
+    "viewport": [
+      1280,
+      720
+    ],
+    "page": [
+      1280,
+      720
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          48,
+          48
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          46.5882568359375,
+          18.628662109375
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          33.88238525390625,
+          33.88238525390625
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-mode",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-special",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-maps",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-levels",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-spiral",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          54.950927734375,
+          54.950927734375
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          53.3348388671875,
+          21.32635498046875
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          38.7889404296875,
+          38.7889404296875
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-turn",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-G ",
+        "size": [
+          54.950927734375,
+          54.950927734375
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          53.3348388671875,
+          21.32635498046875
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-R ",
+        "size": [
+          38.7889404296875,
+          38.7889404296875
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-ended",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-G ",
+        "size": [
+          54.950927734375,
+          54.950927734375
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-R ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-recap",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1802
+    ],
+    "launcher": [
+      {
+        "type": "ball color-G ",
+        "size": [
+          54.950927734375,
+          54.950958251953125
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-R ",
+        "size": [
+          0,
+          0
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-straight",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          48,
+          48
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          46.5882568359375,
+          18.628662109375
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          33.88232421875,
+          33.88232421875
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  },
+  {
+    "name": "1920-s",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "page": [
+      1920,
+      1080
+    ],
+    "launcher": [
+      {
+        "type": "ball color-B ",
+        "size": [
+          48,
+          48
+        ],
+        "font": "13px",
+        "text": ""
+      },
+      {
+        "type": "SPAN",
+        "size": [
+          46.5882568359375,
+          18.62860107421875
+        ],
+        "font": "22px",
+        "text": "下一颗"
+      },
+      {
+        "type": "ball color-G ",
+        "size": [
+          33.88232421875,
+          33.88238525390625
+        ],
+        "font": "22px",
+        "text": ""
+      }
+    ]
+  }
+]

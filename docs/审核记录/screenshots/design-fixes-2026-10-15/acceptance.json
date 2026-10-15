@@ -1,0 +1,524 @@
+{
+  "evidence": [
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "straight",
+      "level": 1,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88238525390625,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.994171142578125,
+        13.99420166015625
+      ],
+      "sceneHeight": 435,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "straight",
+      "level": 2,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88238525390625,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.997055053710938,
+        13.9970703125,
+        13.9970703125
+      ],
+      "sceneHeight": 435,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "straight",
+      "level": 3,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88238525390625,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.997856140136719,
+        13.997848510742188,
+        13.997848510742188,
+        13.99786376953125,
+        13.99786376953125,
+        13.997833251953125,
+        13.99786376953125
+      ],
+      "sceneHeight": 434.875,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "s",
+      "level": 1,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.995635986328125,
+        13.99560546875
+      ],
+      "sceneHeight": 435,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "s",
+      "level": 2,
+      "pageFits": true,
+      "current": 47.99993896484375,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.99908447265625,
+        13.999053955078125,
+        13.999053955078125
+      ],
+      "sceneHeight": 435,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "s",
+      "level": 3,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88238525390625,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9984130859375,
+        13.998382568359375,
+        13.9984130859375,
+        13.998382568359375,
+        13.998382568359375,
+        13.9984130859375,
+        13.9984130859375
+      ],
+      "sceneHeight": 435,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "spiral",
+      "level": 1,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9896240234375,
+        13.9896240234375
+      ],
+      "sceneHeight": 435,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "spiral",
+      "level": 2,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9896240234375,
+        13.9896240234375,
+        13.98956298828125
+      ],
+      "sceneHeight": 435,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1280,
+      "height": 720,
+      "map": "spiral",
+      "level": 3,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9896240234375,
+        13.9896240234375,
+        13.98956298828125,
+        13.98956298828125,
+        13.989593505859375,
+        13.989593505859375,
+        13.989593505859375
+      ],
+      "sceneHeight": 435,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "straight",
+      "level": 1,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.994781494140625,
+        13.99481201171875
+      ],
+      "sceneHeight": 483,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "straight",
+      "level": 2,
+      "pageFits": true,
+      "current": 48.00006103515625,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9993896484375,
+        13.9993896484375,
+        13.9993896484375
+      ],
+      "sceneHeight": 483,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "straight",
+      "level": 3,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.997528076171875,
+        13.997512817382812,
+        13.997543334960938,
+        13.997528076171875,
+        13.99749755859375,
+        13.997528076171875,
+        13.99755859375
+      ],
+      "sceneHeight": 453.171875,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "s",
+      "level": 1,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88238525390625,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.990325927734375,
+        13.990325927734375
+      ],
+      "sceneHeight": 483,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "s",
+      "level": 2,
+      "pageFits": true,
+      "current": 47.99993896484375,
+      "next": 33.88238525390625,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.997711181640625,
+        13.9976806640625,
+        13.997711181640625
+      ],
+      "sceneHeight": 483,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "s",
+      "level": 3,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88238525390625,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9951171875,
+        13.99517822265625,
+        13.995147705078125,
+        13.99517822265625,
+        13.995147705078125,
+        13.99517822265625,
+        13.9951171875
+      ],
+      "sceneHeight": 483,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "spiral",
+      "level": 1,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9925537109375,
+        13.9925537109375
+      ],
+      "sceneHeight": 483,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "spiral",
+      "level": 2,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9925537109375,
+        13.9925537109375,
+        13.9925537109375
+      ],
+      "sceneHeight": 483,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "map": "spiral",
+      "level": 3,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9925537109375,
+        13.9925537109375,
+        13.9925537109375,
+        13.9925537109375,
+        13.9925537109375,
+        13.9925537109375,
+        13.9925537109375
+      ],
+      "sceneHeight": 483,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "straight",
+      "level": 1,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9986572265625,
+        13.9986572265625
+      ],
+      "sceneHeight": 609.046875,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "straight",
+      "level": 2,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.8824462890625,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.998321533203125,
+        13.99835205078125,
+        13.99835205078125
+      ],
+      "sceneHeight": 562.1875,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "straight",
+      "level": 3,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.997528076171875,
+        13.997528076171875,
+        13.99755859375,
+        13.99755859375,
+        13.9974365234375,
+        13.99749755859375,
+        13.99755859375
+      ],
+      "sceneHeight": 453.171875,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "s",
+      "level": 1,
+      "pageFits": true,
+      "current": 70.24090576171875,
+      "next": 49.58184814453125,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9932861328125,
+        13.9932861328125
+      ],
+      "sceneHeight": 760,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "s",
+      "level": 2,
+      "pageFits": true,
+      "current": 63.40789794921875,
+      "next": 44.758544921875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.987060546875,
+        13.987060546875,
+        13.987060546875
+      ],
+      "sceneHeight": 760,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "s",
+      "level": 3,
+      "pageFits": true,
+      "current": 48,
+      "next": 33.88232421875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.99737548828125,
+        13.9974365234375,
+        13.9974365234375,
+        13.9974365234375,
+        13.9974365234375,
+        13.9974365234375,
+        13.9974365234375
+      ],
+      "sceneHeight": 760,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "spiral",
+      "level": 1,
+      "pageFits": true,
+      "current": 54.950927734375,
+      "next": 38.7889404296875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9913330078125,
+        13.991455078125
+      ],
+      "sceneHeight": 760,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "spiral",
+      "level": 2,
+      "pageFits": true,
+      "current": 54.950927734375,
+      "next": 38.7889404296875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9913330078125,
+        13.991455078125,
+        13.991455078125
+      ],
+      "sceneHeight": 760,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "map": "spiral",
+      "level": 3,
+      "pageFits": true,
+      "current": 54.950927734375,
+      "next": 38.7889404296875,
+      "launcherFits": true,
+      "trackFits": true,
+      "labels": [
+        13.9913330078125,
+        13.991455078125,
+        13.991455078125,
+        13.991455078125,
+        13.991424560546875,
+        13.991424560546875,
+        13.991424560546875
+      ],
+      "sceneHeight": 760,
+      "background": "radial-gradient(at 45% 40%, rgb(48, 67, 50), rgb(21, 39, 31) 78%)"
+    }
+  ],
+  "flight": true,
+  "skip": true,
+  "ended": true,
+  "lost": true,
+  "recap": true,
+  "previews": true,
+  "errors": []
+}
